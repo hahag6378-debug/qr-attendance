@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 // ទីតាំង GPS ក្រុមហ៊ុន (អាចប្តូរ Coordinate តាមក្រោយបាន)
 const OFFICE_LAT = 11.5307426;
 const OFFICE_LNG = 104.9237006;
-const ALLOWED_METERS = 50000;
+const ALLOWED_METERS = 30;
 
 function getDistance(lat1, lon1, lat2, lon2) {
     const R = 6371e3;
@@ -38,7 +38,7 @@ app.post('/api/checkin', async (req, res) => {
     // គណនាចម្ងាយ
     const distance = getDistance(OFFICE_LAT, OFFICE_LNG, userLat, userLng);
 
-    // ប្រសិនបើស្ថិតក្នុងរង្វង់ ១០០ ម៉ែត្រ
+    // ប្រសិនបើស្ថិតក្នុងរង្វង់ 10 ម៉ែត្រ
     if (distance <= ALLOWED_METERS) {
         try {
             // បញ្ជូនទិន្នន័យទៅ Google Sheet
@@ -64,7 +64,7 @@ app.post('/api/checkin', async (req, res) => {
             return res.status(500).json({ success: false, message: "មានបញ្ហាក្នុងការបញ្ជូនទៅ Google Sheet!" });
         }
     } else {
-        // បើនៅឆ្ងាយលើស ១០០ ម៉ែត្រ
+        // បើនៅឆ្ងាយលើស ៣០ ម៉ែត្រ
         return res.status(400).json({
             success: false,
             message: `បរាជ័យ! អ្នកនៅឆ្ងាយពីក្រុមហ៊ុនពេក (${(distance/1000).toFixed(2)} km)`
