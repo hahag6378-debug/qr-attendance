@@ -6,7 +6,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// បញ្ជូន File index.html ទៅកាន់ទូរស័ព្ទដោយស្វ័យប្រវត្តិ
+// 🔴 1. ដាក់ Google Sheet Web App URL របស់អ្នកត្រង់នេះ
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbzyVbizqdKWSy03tvw9NKPBS4zRTxkvv9odNv82h8QxdYeXGBVN1vNwwu7yY_qk4DDQjQ/exec";
+
+// បញ្ជូន File index.html ទៅកាន់អ្នកប្រើប្រាស់ដោយស្វ័យប្រវត្តិ
 app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
@@ -29,22 +32,45 @@ function getDistance(lat1, lon1, lat2, lon2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-app.post('/api/checkin', (req, res) => {
-    const { userName, userLat, userLng } = req.body;
+app.post('/api/checkin', async (req, res) => {
+    const { userName, userLat, userLng, actionType } = req.body;
+    
+    // គណនាចម្ងាយ
     const distance = getDistance(OFFICE_LAT, OFFICE_LNG, userLat, userLng);
 
+    // ប្រសិនបើស្ថិតក្នុងរង្វង់ ១០០ ម៉ែត្រ
     if (distance <= ALLOWED_METERS) {
-        return res.json({ 
-            success: true, 
-            message: `ចុះវត្តមានជោគជ័យ! អ្នកនៅចម្ងាយ ${distance.toFixed(0)}m ពីក្រុមហ៊ុន។` 
-        });
+        try {
+            // បញ្ជូនទិន្នន័យទៅ Google Sheet
+            if (GOOGLE_SHEET_URL && !GOOGLE_SHEET_URL.includes("YOUR_ACTUAL_SCRIPT_ID")) {
+                await fetch(GOOGLE_SHEET_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userName,
+                        userLat,
+                        userLng,
+                        status: actionType || "វត្តមាន"
+                    })
+                });
+            }
+
+            return res.json({
+                success: true,
+                message: `ចុះវត្តមានជោគជ័យ! អ្នកនៅចម្ងាយ ${distance.toFixed(0)}m ពីក្រុមហ៊ុន។`
+            });
+        } catch (err) {
+            console.error("Sheet Error:", err);
+            return res.status(500).json({ success: false, message: "មានបញ្ហាក្នុងការបញ្ជូនទៅ Google Sheet!" });
+        }
     } else {
-        return res.status(400).json({ 
-            success: false, 
-            message: `បរាជ័យ! អ្នកនៅឆ្ងាយពីក្រុមហ៊ុនពេក (${(distance/1000).toFixed(2)} km)។` 
+        // បើនៅឆ្ងាយលើស ១០០ ម៉ែត្រ
+        return res.status(400).json({
+            success: false,
+            message: `បរាជ័យ! អ្នកនៅឆ្ងាយពីក្រុមហ៊ុនពេក (${(distance/1000).toFixed(2)} km)`
         });
     }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
