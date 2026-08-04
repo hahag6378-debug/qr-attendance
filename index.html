@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រងវត្តមានបុគ្គលិក - Attendance System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Library Scan QR Code -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- FontAwesome Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap');
+        body { font-family: 'Kantumruy Pro', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-indigo-600 text-white shadow-lg py-4 px-6 mb-8">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-qrcode text-2xl"></i> ប្រព័ន្ធគ្រប់គ្រងវត្តមានបុគ្គលិក
+            </h1>
+            <span class="bg-indigo-500 text-xs px-3 py-1 rounded-full border border-indigo-400">v2.1 Export Excel</span>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-6">
+        
+        <!-- ផ្នែកខាងឆ្វេង៖ Scanner Form -->
+        <div class="md:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-fit">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-camera text-indigo-600"></i> Scan ចុះវត្តមាន
+            </h2>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">ឈ្មោះ ឬ ID បុគ្គលិក</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                        <i class="fa-solid fa-user"></i>
+                    </span>
+                    <input type="text" id="userName" placeholder="បញ្ចូលឈ្មោះ ឬ ID..." 
+                        class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                </div>
+            </div>
+
+            <!-- កាមេរ៉ា Scan -->
+            <div id="reader" class="rounded-xl overflow-hidden border-2 border-dashed border-slate-300"></div>
+
+            <!-- Status Message -->
+            <div id="status" class="mt-4 p-3 rounded-xl text-center text-sm font-medium bg-slate-100 text-slate-600">
+                <i class="fa-solid fa-circle-info mr-1"></i> សូមបញ្ចូលឈ្មោះ រួច Scan QR Code
+            </div>
+        </div>
+
+        <!-- ផ្នែកខាងស្តាំ៖ តារាងកត់ត្រាវត្តមាន -->
+        <div class="md:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-indigo-600"></i> ប្រវត្តិនៃការ Scan វត្តមាន
+                </h2>
+                <div class="flex items-center gap-2">
+                    <span id="logCount" class="text-xs bg-indigo-50 text-indigo-600 font-semibold px-2.5 py-1.5 rounded-lg">0 នាក់</span>
+                    <!-- ប៊ូតុង Export Excel (CSV) -->
+                    <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-file-excel"></i> ទាញយក Excel
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-500 font-medium">
+                            <th class="py-3 px-2">បុគ្គលិក</th>
+                            <th class="py-3 px-2">ពេលវេលា</th>
+                            <th class="py-3 px-2">ចម្ងាយ GPS</th>
+                            <th class="py-3 px-2">ស្ថានភាព</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTable" class="divide-y divide-slate-100">
+                        <tr id="emptyRow">
+                            <td colspan="4" class="text-center py-8 text-slate-400">មិនទាន់មានទិន្នន័យ Scan នៅឡើយទេ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const logsTable = document.getElementById('logsTable');
+        const emptyRow = document.getElementById('emptyRow');
+        const logCount = document.getElementById('logCount');
+        
+        // Array សម្រាប់ផ្ទុកទិន្នន័យសម្រាប់ Export
+        let attendanceLogs = [];
+        let count = 0;
+
+        const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 220 });
+        html5QrcodeScanner.render(onScanSuccess);
+
+        function onScanSuccess(qrCodeMessage) {
+            const userName = document.getElementById('userName').value;
+            
+            if (!userName) {
+                alert("សូមបញ្ចូលឈ្មោះ ឬ ID បុគ្គលិកជាមុនសិន!");
+                return;
+            }
+
+            setStatus("⏳ កំពុងចាប់យកទីតាំង GPS...", "bg-amber-50 text-amber-700 border border-amber-200");
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    sendData(userName, userLat, userLng);
+                }, () => {
+                    setStatus("❌ មិនអាចចាប់ GPS បានទេ!", "bg-rose-50 text-rose-700 border border-rose-200");
+                });
+            } else {
+                setStatus("❌ កម្មវិធីនេះមិនគាំទ្រ GPS ទេ", "bg-rose-50 text-rose-700 border border-rose-200");
+            }
+        }
+
+        function sendData(userName, userLat, userLng) {
+            fetch('/api/checkin', {
+                const now = new Date();
+                const timeString = now.toLocaleDateString('km-KH') + " " + now.toLocaleTimeString();
+
+                if(data.success) {
+                    setStatus(`✅ ${data.message}`, "bg-emerald-50 text-emerald-700 border border-emerald-200");
+                    addLogToTable(userName, timeString, "ក្នុងតំបន់", "ជោគជ័យ", "emerald");
+                } else {
+                    setStatus(`❌ ${data.message}`, "bg-rose-50 text-rose-700 border border-rose-200");
+                    addLogToTable(userName, timeString, "ក្រៅតំបន់", "បរាជ័យ", "rose");
+                }
+            })
+            .catch(() => {
+                setStatus("❌ មានបញ្ហាក្នុងការតភ្ជាប់ទៅ Server!", "bg-rose-50 text-rose-700 border border-rose-200");
+            });
+        }
+
+        function setStatus(msg, classes) {
+            statusDiv.className = `mt-4 p-3 rounded-xl text-center text-sm font-medium ${classes}`;
+            statusDiv.innerHTML = msg;
+        }
+
+        function addLogToTable(name, time, gpsStatus, status, color) {
+            if (emptyRow) emptyRow.remove();
+            count++;
+            logCount.innerText = `${count} នាក់`;
+
+            // រក្សាទុកក្នុង Array សម្រាប់ Export
+            attendanceLogs.push({ name, time, gpsStatus, status });
+
+            const row = document.createElement('tr');
+            row.className = "hover:bg-slate-50 transition";
+            row.innerHTML = `
+                <td class="py-3 px-2 font-semibold text-slate-800">${name}</td>
+                <td class="py-3 px-2 text-slate-500">${time}</td>
+                <td class="py-3 px-2 text-slate-500">${gpsStatus}</td>
+                <td class="py-3 px-2">
+                    <span class="bg-${color}-100 text-${color}-700 text-xs px-2.5 py-1 rounded-md font-medium">
+                        ${status}
+                    </span>
+                </td>
+            `;
+            logsTable.prepend(row);
+        }
+
+        // មុខងារទាញយកទិន្នន័យជា File CSV (Excel)
+        function exportToCSV() {
+            if (attendanceLogs.length === 0) {
+                alert("មិនទាន់មានទិន្នន័យសម្រាប់ទាញយកទេ!");
+                return;
+            }
+
+            // កំណត់ចំណងជើងជួរឈរ (Headers)
+            let csvContent = "\uFEFF"; // \uFEFF សម្រាប់ជំនួយអក្សរខ្មែរ (UTF-8 BOM) ក្នុង Excel
+            csvContent += "ឈ្មោះបុគ្គលិក,កាលបរិច្ឆេទ និងម៉ោង,ទីតាំង GPS,ស្ថានភាព\n";
+
+            // បញ្ចូលទិន្នន័យតាមជួរ
+            attendanceLogs.forEach(row => {
+                csvContent += `"${row.name}","${row.time}","${row.gpsStatus}","${row.status}"\n`;
+            });
+
+            // បង្កើត Link ទាញយក File
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `Attendance_Report_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
