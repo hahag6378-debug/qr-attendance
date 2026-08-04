@@ -17,9 +17,9 @@ app.get('/', (req, res) => {
 });
 
 // ទីតាំង GPS ក្រុមហ៊ុន (អាចប្តូរ Coordinate តាមក្រោយបាន)
-const OFFICE_LAT = 11.5564;
-const OFFICE_LNG = 104.9282;
-const ALLOWED_METERS = 100;
+const OFFICE_LAT = 11.5307426;
+const OFFICE_LNG = 104.9237006;
+const ALLOWED_METERS = 50000;
 
 function getDistance(lat1, lon1, lat2, lon2) {
     const R = 6371e3;
@@ -74,3 +74,49 @@ app.post('/api/checkin', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// កូដសម្គាល់ QR Code ដែលអ្នកបាន Print បិទនៅច្រកទ្វារ
+const VALID_QR_CODE = "COMPANY_OFFICE_QR_2026";
+
+app.post('/api/checkin', async (req, res) => {
+    const { userName, userLat, userLng, actionType, qrCodeData } = req.body;
+    
+    // ១. ផ្ទៀងផ្ទាត់ QR Code
+    if (qrCodeData !== VALID_QR_CODE) {
+        return res.status(400).json({
+            success: false,
+            message: "QR Code មិនត្រឹមត្រូវ! សូមស្កេន QR Code ក្រុមហ៊ុននៅច្រកទ្វារ។"
+        });
+    }
+
+    // ២. ផ្ទៀងផ្ទាត់ GPS ចម្ងាយ
+    const distance = getDistance(OFFICE_LAT, OFFICE_LNG, userLat, userLng);
+
+    if (distance <= ALLOWED_METERS) {
+        try {
+            if (GOOGLE_SHEET_URL && !GOOGLE_SHEET_URL.includes("YOUR_ACTUAL_SCRIPT_ID")) {
+                await fetch(GOOGLE_SHEET_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userName,
+                        userLat,
+                        userLng,
+                        status: actionType || "Check-In"
+                    })
+                });
+            }
+
+            return res.json({
+                success: true,
+                message: `ចុះវត្តមាន ${actionType} ជោគជ័យ! (${distance.toFixed(0)}m ពីក្រុមហ៊ុន)`
+            });
+        } catch (err) {
+            return res.status(500).json({ success: false, message: "មានបញ្ហាក្នុងការបញ្ជូនទៅ Google Sheet!" });
+        }
+    } else {
+        return res.status(400).json({
+            success: false,
+            message: `បរាជ័យ! អ្នកនៅឆ្ងាយពីក្រុមហ៊ុនពេក (${(distance/1000).toFixed(2)} km)`
+        });
+    }
+});
