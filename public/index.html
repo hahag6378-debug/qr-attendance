@@ -8,110 +8,53 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- ប្រើ Library ជំនាន់ស្ថិរភាព -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Kantumruy Pro', sans-serif !important;
-        }
-
-        body { 
-            margin: 0; 
-            padding: 16px; 
-            background-color: #F2F2F7;
-            color: #1C1C1E;
-            display: flex;
-            justify-content: center;
-        }
-
-        .ios-container {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
+        * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif !important; }
+        body { margin: 0; padding: 16px; background-color: #F2F2F7; color: #1C1C1E; display: flex; justify-content: center; }
+        .ios-container { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 16px; }
         .ios-header { text-align: center; }
         h2 { font-size: 22px; margin: 0 0 4px 0; }
         .ios-subtitle { font-size: 14px; color: #8E8E93; }
-
-        .ios-group {
-            background-color: #FFFFFF;
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
-        label.field-label {
-            font-weight: 600;
-            font-size: 13px;
-            color: #8E8E93;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        input[type="text"] { 
-            width: 100%; 
-            padding: 14px; 
-            font-size: 16px; 
-            background-color: #F2F2F7;
-            border: 1px solid transparent;
-            border-radius: 12px; 
-            outline: none;
-        }
+        
+        .ios-group { background-color: #FFFFFF; border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
+        label.field-label { font-weight: 600; font-size: 13px; color: #8E8E93; display: block; margin-bottom: 8px; }
+        input[type="text"] { width: 100%; padding: 14px; font-size: 16px; background-color: #F2F2F7; border: 1px solid transparent; border-radius: 12px; outline: none; }
 
         .ios-action-group { display: flex; gap: 12px; }
         .ios-action-option { flex: 1; position: relative; }
         .ios-action-option input[type="radio"] { position: absolute; opacity: 0; }
-
-        .ios-action-option label {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #FFFFFF;
-            padding: 16px 8px;
-            border-radius: 16px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
+        .ios-action-option label { display: flex; flex-direction: column; align-items: center; background-color: #FFFFFF; padding: 16px 8px; border-radius: 16px; cursor: pointer; border: 2px solid transparent; font-weight: 600; font-size: 13px; }
         .ios-icon { font-size: 26px; margin-bottom: 6px; }
+        .ios-action-option input[type="radio"]:checked + label { border-color: #007AFF; background-color: rgba(0, 122, 255, 0.06); color: #007AFF; }
 
-        .ios-action-option input[type="radio"]:checked + label {
-            border-color: #007AFF;
-            background-color: rgba(0, 122, 255, 0.06);
-            color: #007AFF;
-        }
-
-        .scanner-wrapper {
-            position: relative;
-            width: 100%;
-            min-height: 280px;
-            background-color: #000;
-            border-radius: 14px;
-            overflow: hidden;
-        }
-
+        .scanner-wrapper { position: relative; width: 100%; min-height: 280px; background-color: #000; border-radius: 14px; overflow: hidden; }
         #reader { width: 100% !important; border: none !important; }
 
-        #status { 
-            display: none;
-            align-items: center;
-            gap: 10px;
-            padding: 14px 16px; 
-            border-radius: 12px; 
-            font-size: 14px;
-            font-weight: 600;
-        }
-
+        #status { display: none; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; }
         .success { background-color: rgba(52, 199, 89, 0.12); color: #34C759; }
         .error { background-color: rgba(255, 59, 48, 0.12); color: #FF3B30; }
         .loading { background-color: rgba(0, 122, 255, 0.12); color: #007AFF; }
+
+        /* ប៊ូតុងទាញយកទិន្នន័យ */
+        .btn-download {
+            background-color: #007AFF;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-download:active { opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -119,7 +62,7 @@
 <div class="ios-container">
     <div class="ios-header">
         <h2>ចុះវត្តមានធ្វើការ</h2>
-        <div class="ios-subtitle">សូមស្កេន QR Code ដើមី្បកត់ត្រា</div>
+        <div class="ios-subtitle">សូមស្កេន QR Code ដើម្បីកត់ត្រា</div>
     </div>
     
     <div class="ios-group">
@@ -149,6 +92,11 @@
         <span id="status-icon">🔄</span>
         <span id="status-text"></span>
     </div>
+
+    <!-- ប៊ូតុងទាញយកទិន្នន័យ -->
+    <a href="/api/export-data" download class="btn-download">
+        📥 ទាញយករបាយការណ៍វត្តមាន
+    </a>
 </div>
 
 <script>
@@ -170,7 +118,7 @@
     }
 
     function sendData(userName, lat, lng, actionType, qrData) {
-        showStatus("កំពុងផ្ទៀងផ្ទាត់...", 'loading');
+        showStatus("កំពុងផ្ទៀងផ្ទាត់ GPS និង QR Code...", 'loading');
         
         fetch('/api/checkin', {
             method: 'POST',
@@ -180,15 +128,14 @@
         .then(res => res.json())
         .then(data => {
             showStatus(data.message, data.success ? 'success' : 'error');
-            setTimeout(() => { isProcessing = false; }, 3000);
+            setTimeout(() => { isProcessing = false; }, 4000);
         })
         .catch(() => {
             showStatus("មានបញ្ហាតភ្ជាប់ទៅ Server!", 'error');
-            setTimeout(() => { isProcessing = false; }, 3000);
+            setTimeout(() => { isProcessing = false; }, 4000);
         });
     }
 
-    // កំណត់ទំហំស្កេន និង Frame Rate ឱ្យលឿនជាងមុន
     const config = { 
         fps: 20, 
         qrbox: function(viewfinderWidth, viewfinderHeight) {
@@ -217,15 +164,24 @@
 
             isProcessing = true;
             
-            navigator.geolocation.getCurrentPosition(
-                (pos) => sendData(userName, pos.coords.latitude, pos.coords.longitude, actionType, decodedText),
-                () => sendData(userName, 11.5564, 104.9282, actionType, decodedText),
-                { timeout: 4000 }
-            );
+            // ចាប់យក Location ពិតប្រាកដរបស់ទូរស័ព្ទ
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        sendData(userName, pos.coords.latitude, pos.coords.longitude, actionType, decodedText);
+                    },
+                    (error) => {
+                        showStatus("សូមបើក Location (GPS) លើទូរស័ព្ទរបស់អ្នក!", 'error');
+                        setTimeout(() => { isProcessing = false; }, 4000);
+                    },
+                    { enableHighAccuracy: true, timeout: 5000 }
+                );
+            } else {
+                showStatus("ទូរស័ព្ទរបស់អ្នកមិនគាំទ្រ GPS ទេ!", 'error');
+                setTimeout(() => { isProcessing = false; }, 4000);
+            }
         },
-        (errorMessage) => {
-            // កំពុងស្កេនស្វែងរក QR (មិនបាច់ធ្វើអ្វី)
-        }
+        (errorMessage) => {}
     ).catch(err => {
         showStatus("មិនអាចបើកកាមេរ៉ាបានទេ! សូមពិនិត្យសិទ្ធិ (Permission)", 'error');
     });
