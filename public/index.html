@@ -16,11 +16,16 @@
         .btn-checkin.active { background: #4F46E5; color: white; }
         .btn-checkout { background: #FEE2E2; color: #991B1B; border: 2px solid #EF4444; }
         .btn-checkout.active { background: #DC2626; color: white; }
-        #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; }
+        
+        /* កែច្នៃកន្លែងបង្ហាញកាមេរ៉ាឱ្យស្អាត */
+        #interactive { width: 100%; max-width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background: #000; position: relative; }
+        #reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+        
         .status-msg { margin-top: 15px; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; display: none; }
         .status-success { background: #DCFCE7; color: #166534; display: block; }
         .status-error { background: #FEE2E2; color: #991B1B; display: block; }
-        input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #CBD5E1; margin-bottom: 12px; font-size: 14px; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #CBD5E1; margin-bottom: 14px; font-size: 14px; outline: none; }
+        input:focus { border-color: #4F46E5; }
     </style>
 </head>
 <body>
@@ -33,14 +38,17 @@
 
     <input type="text" id="userName" placeholder="បញ្ចូលឈ្មោះ ឬ ID បុគ្គលិក...">
 
-    <div id="reader"></div>
+    <div id="interactive">
+        <div id="reader" style="width: 100%; height: 100%;"></div>
+    </div>
 
     <div id="statusBox" class="status-msg"></div>
 </div>
 
 <script>
     let currentAction = 'Check-In';
-    let html5QrcodeScanner = null;
+    let html5QrCode = null;
+    let isScanning = true;
 
     function setAction(action) {
         currentAction = action;
@@ -60,28 +68,19 @@
     }
 
     async function onScanSuccess(decodedText, decodedResult) {
-        const userName = document.getElementById('userName').value.trim() || 'Employee';
-        
-        // ទាញយក Token និង Chat ID ដែលបាន Save ក្នុង LocalStorage (ពី Admin)
-        const botToken = localStorage.getItem('config_tgToken') || '';
-        const chatId = localStorage.getItem('config_tgChatId') || '';
+        if (!isScanning) return;
+        isScanning = false; // បញ្ឈប់ការស្កេនជាន់គ្នា
 
-        // បញ្ឈប់ការស្កេនបណ្តោះអាសន្ន
-        if (html5QrcodeScanner) {
-            html5QrcodeScanner.pause(true);
-        }
+        const userName = document.getElementById('userName').value.trim() || 'Employee';
 
         try {
-            // 🟢 ប្រើ Relative Path '/api/scan-attendance' ដើម្បីឱ្យដើរលើ Render ដោយស្វ័យប្រវត្តិ
             const response = await fetch('/api/scan-attendance', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userName: userName,
                     actionType: currentAction,
-                    distance: 0,
-                    botToken: botToken,
-                    chatId: chatId
+                    distance: 0
                 })
             });
 
@@ -97,18 +96,28 @@
             showStatus('❌ មានបញ្ហាភ្ជាប់ទៅ Server!', false);
         }
 
-        // ឱ្យស្កេនបន្តទៀតក្រោយ ២ វិនាទី
+        // អនុញ្ញាតឱ្យស្កេនម្តងទៀតបន្ទាប់ពី ២.៥ វិនាទី
         setTimeout(() => {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.resume();
-            }
-        }, 2000);
+            isScanning = true;
+        }, 2500);
     }
 
-    // បើកកាមេរ៉ាស្កេន QR Code
+    // 🟢 អនុគមន៍បើកកាមេរ៉ាស្វ័យប្រវត្តិ
+    function startCamera() {
+        html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 10, qrbox: { width: 220, height: 220 } };
+
+        // បើកកាមេរ៉ាក្រោយ (Environment Camera) ដោយស្វ័យប្រវត្តិ
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+        .catch(err => {
+            console.warn("កាមេរ៉ាក្រោយមិនដើរ, កំពុងបើកកាមេរ៉ាដែលទំនេរ...", err);
+            html5QrCode.start({ facingMode: "user" }, config, onScanSuccess)
+            .catch(e => showStatus("❌ មិនអាចបើកកាមេរ៉ាបានទេ! សូមបើក Permission ក្នុង Browser", false));
+        });
+    }
+
     window.onload = function() {
-        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } });
-        html5QrcodeScanner.render(onScanSuccess);
+        startCamera();
     };
 </script>
 
