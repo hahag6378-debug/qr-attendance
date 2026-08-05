@@ -40,8 +40,12 @@ app.post('/api/checkin', async (req, res) => {
     }
 
     // ផ្ទៀងផ្ទាត់ QR Code
-    if (qrCodeData !== VALID_QR_CODE) {
-        return res.status(400).json({ success: false, message: "QR Code មិនត្រឹមត្រូវឡើយ!" });
+if (qrCodeData !== VALID_QR_CODE) {
+    return res.status(400).json({ 
+        success: false, 
+        message: `QR មិនត្រូវ! អ្នកស្កេនចំ: "${qrCodeData}"` 
+    });
+}
     }
 
     // ផ្ទៀងផ្ទាត់ទីតាំង GPS (30m)
