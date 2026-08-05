@@ -1,74 +1,54 @@
-const express = require('express');
-const app = express();
+function calculateAttendanceStatus(actionType, scanDate) {
+    const hours = scanDate.getHours();
+    const minutes = scanDate.getMinutes();
+    const totalMinutes = hours * 60 + minutes; // គិតជាទីតាំងនាទីក្នុងមួយថ្ងៃ (0 - 1439)
+    const gracePeriod = 15; // អនុគ្រោះ ១៥ នាទី
 
-app.use(express.json());
-app.use(express.static('public'));
+    // 1. ករណីស្កេន "ចូល" (Check-In)
+    if (actionType === 'Check-In') {
+        // ប្រសិនបើស្កេនចន្លោះពីព្រលឹម ដល់ម៉ោង 8:00 AM (480 នាទី) -> ចាត់ទុកជា "ចូលវេនព្រឹក" (6:00 AM = 360mn)
+        if (totalMinutes <= 480) { 
+            const shiftStart = 360; // 6:00 AM
+            const lateMinutes = totalMinutes - shiftStart;
+            
+            if (lateMinutes <= gracePeriod) {
+                return { status: 'ទាន់ម៉ោង', shift: 'វេនព្រឹក', lateBy: 0 };
+            } else {
+                return { status: 'យឺត', shift: 'វេនព្រឹក', lateBy: Math.max(0, lateMinutes) };
+            }
+        } 
+        // ប្រសិនបើស្កេនបន្ទាប់ពីម៉ោង 8:00 AM ឡើងទៅ -> ចាត់ទុកជា "ចូលវេនរសៀល" (10:00 AM = 600mn)
+        else {
+            const shiftStart = 600; // 10:00 AM
+            const lateMinutes = totalMinutes - shiftStart;
 
-let attendanceRecords = [];
-
-// 🟢 អនុគមន៍ផ្ញើសារទៅ Telegram (កែប្រែឱ្យដើរ ១០០% គ្មាន Error)
-async function sendTelegramNotification(userName, actionType, distance, botToken, chatId) {
-    if (!botToken || !chatId) {
-        console.log("⚠️ មិនទាន់មាន Bot Token ឬ Chat ID ឡើយ!");
-        return;
-    }
-
-    const icon = actionType === 'Check-In' ? '🟢' : '🔴';
-    const timeString = new Date().toLocaleString('km-KH', { timeZone: 'Asia/Phnom_Penh' });
-
-    // រៀបចំសារធម្មតា (មិនប្រើ Markdown ដើម្បីចៀសវាង Telegram Reject សារ)
-    const message = `${icon} ការស្កេនវត្តមានថ្មី!\n\n` +
-                    `👤 បុគ្គលិក: ${userName}\n` +
-                    `📌 សកម្មភាព: ${actionType}\n` +
-                    `📍 ចម្ងាយ: ${distance} ម៉ែត្រ\n` +
-                    `⏰ កាលបរិច្ឆេទ: ${timeString}`;
-
-    try {
-        const url = `https://api.telegram.org/bot${botToken.trim()}/sendMessage`;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId.trim(),
-                text: message
-            })
-        });
-
-        const resData = await response.json();
-        if (!resData.ok) {
-            console.error("❌ Telegram API Error:", resData.description);
-        } else {
-            console.log("✅ ផ្ញើសារទៅ Telegram ជោគជ័យ!");
+            if (lateMinutes <= gracePeriod) {
+                return { status: 'ទាន់ម៉ោង', shift: 'វេនរសៀល', lateBy: 0 };
+            } else {
+                return { status: 'យឺត', shift: 'វេនរសៀល', lateBy: Math.max(0, lateMinutes) };
+            }
         }
-    } catch (error) {
-        console.error("❌ Fetch Error:", error);
+    } 
+    
+    // 2. ករណីស្កេន "ចេញ" (Check-Out)
+    else {
+        // ប្រសិនបើស្កេនចេញមុនម៉ោង 4:00 PM (960 នាទី) -> ចាត់ទុកជា "ចេញវេនព្រឹក" (2:00 PM = 840mn)
+        if (totalMinutes <= 960) { 
+            const shiftEnd = 840; // 2:00 PM
+            if (totalMinutes < shiftEnd) {
+                return { status: 'ចេញមុន', shift: 'វេនព្រឹក', earlyBy: shiftEnd - totalMinutes };
+            } else {
+                return { status: 'ត្រឹមត្រូវ', shift: 'វេនព្រឹក', earlyBy: 0 };
+            }
+        } 
+        // ប្រសិនបើស្កេនចេញចាប់ពីម៉ោង 4:00 PM ឡើងទៅ -> ចាត់ទុកជា "ចេញវេនរសៀល" (6:00 PM = 1080mn)
+        else {
+            const shiftEnd = 1080; // 6:00 PM
+            if (totalMinutes < shiftEnd) {
+                return { status: 'ចេញមុន', shift: 'វេនរសៀល', earlyBy: shiftEnd - totalMinutes };
+            } else {
+                return { status: 'ត្រឹមត្រូវ', shift: 'វេនរសៀល', earlyBy: 0 };
+            }
+        }
     }
 }
-
-// 🟢 API សម្រាប់បុគ្គលិកស្កេនវត្តមាន
-app.post('/api/scan-attendance', (req, res) => {
-    const { userName, actionType, distance, botToken, chatId } = req.body;
-
-    const newRecord = {
-        id: attendanceRecords.length + 1,
-        userName: userName || 'Employee',
-        actionType: actionType || 'Check-In',
-        distance: distance || 0,
-        timestamp: new Date().toLocaleString('km-KH', { timeZone: 'Asia/Phnom_Penh' })
-    };
-
-    attendanceRecords.unshift(newRecord);
-
-    // ផ្ញើសារទៅ Telegram
-    sendTelegramNotification(newRecord.userName, newRecord.actionType, newRecord.distance, botToken, chatId);
-
-    res.json({ success: true, message: 'ស្កេនវត្តមានជោគជ័យ!', record: newRecord });
-});
-
-// 🟢 API សម្រាប់ Admin
-app.get('/api/export-data', (req, res) => {
-    res.json(attendanceRecords);
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
