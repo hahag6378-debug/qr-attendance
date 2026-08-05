@@ -1,91 +1,79 @@
-<!DOCTYPE html>
-<html lang="km">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ប្រព័ន្ធស្កេនវត្តមានបុគ្គលិក</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <style>
-        body { font-family: 'Kantumruy Pro', sans-serif; text-align: center; padding: 20px; background-color: #f4f6f9; }
-        .card { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input[type="text"] { width: 90%; padding: 10px; margin: 10px 0; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; }
-        .radio-group { margin: 15px 0; font-size: 16px; text-align: left; padding-left: 20px; }
-        #reader { width: 100%; margin-top: 15px; border-radius: 8px; overflow: hidden; }
-        #status { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 6px; }
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
-    </style>
-</head>
-<body>
+const express = require('express');
+const path = require('path');
+const app = express();
 
-<div class="card">
-    <h2>ស្កេនវត្តមានធ្វើការ</h2>
-    
-    <label for="userName"><b>ឈ្មោះ ឬ ID បុគ្គលិក៖</b></label>
-    <input type="text" id="userName" placeholder="ឧទាហរណ៍៖ ស្រីរ៉ា ឬ លីកា">
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-    <div class="radio-group">
-        <label><input type="radio" name="actionType" value="Check-In" checked> ចូលធ្វើការ (Check-In)</label><br>
-        <label><input type="radio" name="actionType" value="Check-Out"> ចេញទៅផ្ទះ (Check-Out)</label>
-    </div>
+// 🔴 ទីតាំងហាងរបស់អ្នក (Latitude, Longitude)
+const OFFICE_LAT = 11.5564; 
+const OFFICE_LNG = 104.9282; 
+const ALLOWED_METERS = 30; // កំណត់ចម្ងាយ ៣០ ម៉ែត្រ
 
-    <div id="reader"></div>
-    <div id="status"></div>
-</div>
+// 🔴 QR Code Content ផ្លូវការរបស់ហាង
+const VALID_QR_CODE = "MY_SHOP_ATTENDANCE_2026";
 
-<script>
-    const html5QrCode = new Html5Qrcode("reader");
+// 🔴 Google Apps Script Web App URL របស់អ្នក
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxDHFlgKX_wMpwM1PE3Mz1oepqLssvK0CsWzUvV1qGhQd2I0-CGUmr7td-tS_G0Vao49g/exec";
 
-    function showStatus(msg, isSuccess) {
-        const statusDiv = document.getElementById('status');
-        statusDiv.innerText = msg;
-        statusDiv.className = isSuccess ? 'success' : 'error';
+// មុខងារគណនាចម្ងាយ GPS (Haversine Formula)
+function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371e3;
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; 
+}
+
+app.post('/api/checkin', async (req, res) => {
+    const { userName, userLat, userLng, actionType, qrCodeData } = req.body;
+
+    if (!userName || userName.trim() === "") {
+        return res.status(400).json({ success: false, message: "សូមបញ្ចូលឈ្មោះ ឬ ID បុគ្គលិក!" });
     }
 
-    function sendCheckin(userName, lat, lng, actionType, qrData) {
-        showStatus("កំពុងផ្ទៀងផ្ទាត់ទិន្នន័យ...", true);
-        
-        fetch('/api/checkin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userName: userName,
-                userLat: lat,
-                userLng: lng,
-                actionType: actionType,
-                qrCodeData: qrData
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            showStatus(data.message, data.success);
-        })
-        .catch(err => {
-            showStatus("មានបញ្ហាតភ្ជាប់ទៅកាន់ Server!", false);
+    // ផ្ទៀងផ្ទាត់ QR Code
+    if (qrCodeData !== VALID_QR_CODE) {
+        return res.status(400).json({ success: false, message: "QR Code មិនត្រឹមត្រូវឡើយ!" });
+    }
+
+    // ផ្ទៀងផ្ទាត់ទីតាំង GPS (30m)
+    const distance = getDistance(OFFICE_LAT, OFFICE_LNG, userLat, userLng);
+    if (distance > ALLOWED_METERS) {
+        return res.status(400).json({
+            success: false,
+            message: `បរាជ័យ! អ្នកនៅឆ្ងាយពីហាងពេក (${distance.toFixed(0)} ម៉ែត្រ)`
         });
     }
 
-    html5QrCode.start(
-        { facingMode: "environment" }, 
-        { fps: 10, qrbox: { width: 220, height: 220 } },
-        (decodedText) => {
-            const userName = document.getElementById('userName').value;
-            const actionType = document.querySelector('input[name="actionType"]:checked').value;
+    // បញ្ជូនទៅកាន់ Google Apps Script
+    try {
+        await fetch(GOOGLE_SHEET_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userName: userName.trim(),
+                userLat,
+                userLng,
+                status: actionType || "Check-In"
+            })
+        });
 
-            if (!userName || userName.trim() === "") {
-                showStatus("សូមវាយឈ្មោះ ឬ ID របស់អ្នកមុននឹងស្កេន!", false);
-                return;
-            }
+        return res.json({
+            success: true,
+            message: `ចុះវត្តមាន ${actionType} ជោគជ័យ! (${distance.toFixed(0)}m ពីហាង)`
+        });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: "មានបញ្ហាក្នុងការផ្ញើទិន្នន័យ!" });
+    }
+});
 
-            navigator.geolocation.getCurrentPosition((pos) => {
-                sendCheckin(userName, pos.coords.latitude, pos.coords.longitude, actionType, decodedText);
-            }, (err) => {
-                showStatus("សូមបើក GPS/Location លើទូរស័ព្ទរបស់អ្នក!", false);
-            });
-        },
-        () => {}
-    );
-</script>
-
-</body>
-</html>
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
