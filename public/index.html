@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- ប្រើ Library ជំនាន់ស្ថិរភាព -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     
     <style>
         * {
@@ -90,14 +91,13 @@
         .scanner-wrapper {
             position: relative;
             width: 100%;
-            height: 280px;
+            min-height: 280px;
             background-color: #000;
             border-radius: 14px;
             overflow: hidden;
         }
 
-        #reader { width: 100% !important; height: 100% !important; border: none !important; }
-        #reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+        #reader { width: 100% !important; border: none !important; }
 
         #status { 
             display: none;
@@ -188,9 +188,22 @@
         });
     }
 
+    // កំណត់ទំហំស្កេន និង Frame Rate ឱ្យលឿនជាងមុន
+    const config = { 
+        fps: 20, 
+        qrbox: function(viewfinderWidth, viewfinderHeight) {
+            let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            return {
+                width: Math.floor(minEdge * 0.75),
+                height: Math.floor(minEdge * 0.75)
+            };
+        },
+        aspectRatio: 1.0
+    };
+
     html5QrCode.start(
         { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 220, height: 220 } },
+        config,
         (decodedText) => {
             if (isProcessing) return;
 
@@ -210,8 +223,12 @@
                 { timeout: 4000 }
             );
         },
-        () => {}
-    );
+        (errorMessage) => {
+            // កំពុងស្កេនស្វែងរក QR (មិនបាច់ធ្វើអ្វី)
+        }
+    ).catch(err => {
+        showStatus("មិនអាចបើកកាមេរ៉ាបានទេ! សូមពិនិត្យសិទ្ធិ (Permission)", 'error');
+    });
 </script>
 
 </body>
