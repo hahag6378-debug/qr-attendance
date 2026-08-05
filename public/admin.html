@@ -3,78 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ផ្ទាំងគ្រប់គ្រង Admin (Dashboard)</title>
+    <title>Admin Dashboard - Attendance System</title>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Libraries for PDF & Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif !important; }
-        body { margin: 0; padding: 20px; background-color: #F2F2F7; color: #1C1C1E; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        h2 { margin-top: 0; color: #007AFF; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #E5E5EA; padding: 12px; text-align: left; }
-        th { background-color: #F2F2F7; color: #1C1C1E; }
-        .btn { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; }
-        .btn-pdf { background: #FF3B30; color: white; }
-        .btn-login { background: #007AFF; color: white; width: 100%; padding: 12px; }
-        input[type="password"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #CCC; margin: 10px 0; font-size: 16px; }
+        body { margin: 0; padding: 0; background-color: #F8FAFC; color: #0F172A; }
+        
+        /* Glassmorphism Header */
+        header { 
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #E2E8F0;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .logo-svg { width: 42px; height: 42px; }
+        .brand-text h1 { margin: 0; font-size: 18px; font-weight: 700; color: #0F172A; }
+        .brand-text p { margin: 0; font-size: 12px; color: #64748B; }
+
+        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+        
+        /* Modern Cards */
+        .card { 
+            background: white; 
+            border-radius: 16px; 
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            margin-bottom: 24px; 
+        }
+
+        /* Action Buttons */
+        .action-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .btn-group { display: flex; gap: 10px; }
+        
+        .btn { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            padding: 10px 18px; 
+            border-radius: 10px; 
+            border: none; 
+            font-weight: 600; 
+            font-size: 14px; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+        }
+        .btn:hover { transform: translateY(-1px); opacity: 0.9; }
+
+        .btn-excel { background: #10B981; color: white; }
+        .btn-pdf { background: #EF4444; color: white; }
+        .btn-orange { background: #F15A24; color: white; }
+        .btn-logout { background: #F1F5F9; color: #64748B; border: 1px solid #CBD5E1; }
+        .btn-logout:hover { background: #E2E8F0; color: #0F172A; }
+
+        /* Login Screen */
+        .login-box { max-width: 380px; margin: 80px auto; text-align: center; }
+        .input-group { margin: 18px 0; text-align: left; }
+        .input-group label { font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px; }
+        input[type="password"] { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            border: 1px solid #CBD5E1; 
+            outline: none; 
+            font-size: 15px;
+            transition: border 0.2s;
+        }
+        input[type="password"]:focus { border-color: #F15A24; }
+
+        /* Modern Table */
+        .table-responsive { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        th { 
+            background: #F8FAFC; 
+            color: #475569; 
+            font-weight: 600; 
+            font-size: 13px; 
+            padding: 14px 16px; 
+            text-align: left; 
+            border-bottom: 2px solid #E2E8F0; 
+        }
+        td { padding: 14px 16px; border-bottom: 1px solid #F1F5F9; font-size: 14px; color: #334155; }
+        tr:last-child td { border-bottom: none; }
+        
+        .badge { 
+            padding: 4px 10px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 4px; 
+        }
+        .badge-in { background: #DCFCE7; color: #166534; }
+        .badge-out { background: #FEF3C7; color: #92400E; }
     </style>
 </head>
 <body>
 
+<header>
+    <div class="brand">
+        <!-- SVG Logo vector matching the brand logo -->
+        <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M43.75 87.5C67.9125 87.5 87.5 67.9125 87.5 43.75C87.5 19.5875 67.9125 0 43.75 0C19.5875 0 0 19.5875 0 43.75C0 67.9125 19.5875 87.5 43.75 87.5ZM43.75 56.25C50.6536 56.25 56.25 50.6536 56.25 43.75C56.25 36.8464 50.6536 31.25 43.75 31.25C36.8464 31.25 31.25 36.8464 31.25 43.75C31.25 50.6536 36.8464 56.25 43.75 56.25Z" fill="#F15A24"/>
+            <circle cx="87.5" cy="43.75" r="15.625" fill="#F15A24"/>
+        </svg>
+        <div class="brand-text">
+            <h1>ATTENDANCE ADMIN</h1>
+            <p>ប្រព័ន្ធគ្រប់គ្រងវត្តមានបុគ្គលិក</p>
+        </div>
+    </div>
+    <div id="header-logout" style="display: none;">
+        <button onclick="logout()" class="btn btn-logout"><i data-lucide="log-out"></i> ចាកចេញ</button>
+    </div>
+</header>
+
 <div class="container">
-    <!-- ផ្ទាំង Login សម្រាប់ Admin -->
-    <div id="login-section" class="card" style="max-width: 400px; margin: 50px auto;">
-        <h2>🔐 ចូលប្រព័ន្ធ Admin</h2>
-        <p>សូមវាយបញ្ចូលលេខកូដសម្ងាត់ Admin:</p>
-        <input type="password" id="adminPass" placeholder="បញ្ចូល Password...">
-        <button onclick="loginAdmin()" class="btn btn-login">Login</button>
-        <p id="loginErr" style="color: red; display: none; margin-top: 10px;">Password មិនត្រឹមត្រូវ!</p>
+    <!-- 🔐 ផ្ទាំង Login Admin -->
+    <div id="login-section" class="card login-box">
+        <svg class="logo-svg" style="width: 60px; height: 60px; margin-bottom: 12px;" viewBox="0 0 100 100" fill="none">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M43.75 87.5C67.9125 87.5 87.5 67.9125 87.5 43.75C87.5 19.5875 67.9125 0 43.75 0C19.5875 0 0 19.5875 0 43.75C0 67.9125 19.5875 87.5 43.75 87.5ZM43.75 56.25C50.6536 56.25 56.25 50.6536 56.25 43.75C56.25 36.8464 50.6536 31.25 43.75 31.25C36.8464 31.25 31.25 36.8464 31.25 43.75C31.25 50.6536 36.8464 56.25 43.75 56.25Z" fill="#F15A24"/>
+            <circle cx="87.5" cy="43.75" r="15.625" fill="#F15A24"/>
+        </svg>
+        <h2 style="margin: 0 0 6px 0;">ចូលប្រព័ន្ធ Admin</h2>
+        <p style="color: #64748B; margin: 0; font-size: 14px;">សូមវាយបញ្ចូលលេខកូដសម្ងាត់</p>
+
+        <div class="input-group">
+            <label>លេខកូដសម្ងាត់ (Password)</label>
+            <input type="password" id="adminPass" placeholder="បញ្ចូល Password..." onkeyup="if(event.key === 'Enter') loginAdmin()">
+        </div>
+        <button onclick="loginAdmin()" class="btn btn-orange" style="width: 100%; justify-content: center; padding: 12px;">
+            <i data-lucide="lock"></i> ចូលប្រើប្រាស់
+        </button>
+        <p id="loginErr" style="color: #EF4444; display: none; margin-top: 12px; font-size: 13px;">❌ Password មិនត្រឹមត្រូវ!</p>
     </div>
 
-    <!-- ផ្ទាំង Dashboard បង្ហាញទិន្នន័យ -->
+    <!-- 📊 ផ្ទាំង Dashboard -->
     <div id="dashboard-section" style="display: none;">
-        <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="card action-bar">
             <div>
-                <h2>📊 របាយការណ៍វត្តមានបុគ្គលិក</h2>
-                <p style="margin: 0; color: #666;">ទិន្នន័យស្កេនវត្តមានទាំងអស់</p>
+                <h2 style="margin: 0; font-size: 20px;">របាយការណ៍វត្តមានបុគ្គលិក</h2>
+                <p style="margin: 4px 0 0 0; color: #64748B; font-size: 13px;">ទិន្នន័យស្កេន Check-in/out ទាំងអស់ក្នុងប្រព័ន្ធ</p>
             </div>
-            <div>
-                <button onclick="downloadPDF()" class="btn btn-pdf">📄 ទាញយក PDF</button>
-                <button onclick="logout()" class="btn" style="background: #8E8E93; color: white;">Logout</button>
+            <div class="btn-group">
+                <button onclick="exportExcel()" class="btn btn-excel">
+                    <i data-lucide="file-spreadsheet"></i> Export Excel
+                </button>
+                <button onclick="downloadPDF()" class="btn btn-pdf">
+                    <i data-lucide="file-text"></i> Export PDF
+                </button>
             </div>
         </div>
 
-        <div class="card">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>ឈ្មោះ / ID បុគ្គលិក</th>
-                        <th>សកម្មភាព</th>
-                        <th>ចម្ងាយ (ម៉ែត្រ)</th>
-                        <th>កាលបរិច្ឆេទ & ពេលវេលា</th>
-                    </tr>
-                </thead>
-                <tbody id="attendanceTable">
-                    <tr><td colspan="5" style="text-align:center;">កំពុងទាញយកទិន្នន័យ...</td></tr>
-                </tbody>
-            </table>
+        <div class="card" style="padding: 12px 24px;">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ឈ្មោះ / ID បុគ្គលិក</th>
+                            <th>សកម្មភាព</th>
+                            <th>ចម្ងាយ (ម៉ែត្រ)</th>
+                            <th>កាលបរិច្ឆេទ & ពេលវេលា</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTable">
+                        <tr><td colspan="5" style="text-align:center;">កំពុងទាញយកទិន្នន័យ...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // 🔑 លេខកូដសម្ងាត់ Admin (អាចដូរបាន)
+    lucide.createIcons();
     const ADMIN_PASSWORD = "admin123456";
+    let globalAttendanceData = [];
 
     function loginAdmin() {
         const inputPass = document.getElementById('adminPass').value;
         if (inputPass === ADMIN_PASSWORD) {
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('dashboard-section').style.display = 'block';
+            document.getElementById('header-logout').style.display = 'block';
             loadAttendance();
         } else {
             document.getElementById('loginErr').style.display = 'block';
@@ -84,6 +210,7 @@
     function logout() {
         document.getElementById('login-section').style.display = 'block';
         document.getElementById('dashboard-section').style.display = 'none';
+        document.getElementById('header-logout').style.display = 'none';
         document.getElementById('adminPass').value = '';
     }
 
@@ -91,51 +218,76 @@
         fetch('/api/export-data')
             .then(res => res.json())
             .then(data => {
+                globalAttendanceData = data;
                 const tbody = document.getElementById('attendanceTable');
                 tbody.innerHTML = '';
                 
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">មិនទាន់មានទិន្នន័យស្កេននៅឡើយទេ</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94A3B8; padding:30px;">មិនទាន់មានទិន្នន័យស្កេននៅឡើយទេ</td></tr>';
                     return;
                 }
 
                 data.forEach(item => {
+                    const isCheckIn = item.actionType === 'Check-In';
+                    const badgeClass = isCheckIn ? 'badge-in' : 'badge-out';
+                    const iconName = isCheckIn ? 'log-in' : 'log-out';
+
                     const row = `<tr>
-                        <td>${item.id}</td>
+                        <td><b>#${item.id}</b></td>
                         <td><b>${item.userName}</b></td>
-                        <td style="color: ${item.actionType === 'Check-In' ? 'green' : 'orange'}; font-weight:bold;">${item.actionType}</td>
+                        <td>
+                            <span class="badge ${badgeClass}">
+                                <i data-lucide="${iconName}" style="width:14px; height:14px;"></i> ${item.actionType}
+                            </span>
+                        </td>
                         <td>${item.distance}</td>
-                        <td>${item.timestamp}</td>
+                        <td style="color:#64748B;">${item.timestamp}</td>
                     </tr>`;
                     tbody.innerHTML += row;
                 });
+                lucide.createIcons();
             });
     }
 
+    // 🟢 Export Excel Function
+    function exportExcel() {
+        if (globalAttendanceData.length === 0) return alert("គ្មានទិន្នន័យសម្រាប់ Export ទេ!");
+        
+        const formattedData = globalAttendanceData.map(item => ({
+            "ID": item.id,
+            "ឈ្មោះបុគ្គលិក": item.userName,
+            "សកម្មភាព": item.actionType,
+            "ចម្ងាយ (ម៉ែត្រ)": item.distance,
+            "កាលបរិច្ឆេទ & ពេលវេលា": item.timestamp
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
+        XLSX.writeFile(workbook, `Attendance_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
+    // 🔴 Export PDF Function
     function downloadPDF() {
-        fetch('/api/export-data')
-            .then(res => res.json())
-            .then(data => {
-                if (data.length === 0) return alert("គ្មានទិន្នន័យសម្រាប់ទាញយកទេ!");
+        if (globalAttendanceData.length === 0) return alert("គ្មានទិន្នន័យសម្រាប់ Export ទេ!");
 
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.setFontSize(16);
-                doc.text("Attendance Summary Report", 14, 15);
-                
-                const tableColumn = ["ID", "Name / ID", "Action", "Distance", "Date Time"];
-                const tableRows = data.map(item => [item.id, item.userName, item.actionType, item.distance, item.timestamp]);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text("Attendance Summary Report", 14, 15);
+        
+        const tableColumn = ["ID", "Name / ID", "Action", "Distance", "Date Time"];
+        const tableRows = globalAttendanceData.map(item => [item.id, item.userName, item.actionType, item.distance, item.timestamp]);
 
-                doc.autoTable({
-                    head: [tableColumn],
-                    body: tableRows,
-                    startY: 25,
-                    theme: 'grid',
-                    headStyles: { fillColor: [0, 122, 255] }
-                });
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 25,
+            theme: 'grid',
+            headStyles: { fillColor: [241, 90, 36] }
+        });
 
-                doc.save(`Attendance_Report_${new Date().toISOString().slice(0,10)}.pdf`);
-            });
+        doc.save(`Attendance_Report_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 </script>
 
