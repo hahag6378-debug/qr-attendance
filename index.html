@@ -3,122 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ប្រព័ន្ធគ្រប់គ្រងវត្តមានបុគ្គលិក</title>
+    <title>ប្រព័ន្ធស្កេនវត្តមានបុគ្គលិក</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif; }
-        body { background-color: #f4f6f8; margin: 0; padding: 0; }
-        
-        .header { background: #4f46e5; color: white; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { margin: 0; font-size: 1.2rem; font-weight: 600; }
-        .version-badge { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
-        
-        .main-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
-        .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .card-title { font-size: 1.1rem; font-weight: 600; color: #1e293b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        
-        input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 12px; outline: none; font-size: 0.95rem; }
-        input:focus { border-color: #4f46e5; }
-        
-        #reader { border-radius: 12px; overflow: hidden; border: none !important; }
-        #reader video { border-radius: 12px; object-fit: cover; }
-        
-        .status-msg { margin-top: 12px; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.9rem; }
-        .success { background: #dcfce7; color: #15803d; }
-        .error { background: #fee2e2; color: #b91c1c; }
-        
-        .btn-excel { background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500; cursor: pointer; float: right; }
-        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
-        th { color: #64748b; font-weight: 500; }
+        body { font-family: 'Kantumruy Pro', sans-serif; text-align: center; padding: 20px; background-color: #f4f6f9; }
+        .card { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input[type="text"] { width: 90%; padding: 10px; margin: 10px 0; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; }
+        .radio-group { margin: 15px 0; font-size: 16px; text-align: left; padding-left: 20px; }
+        #reader { width: 100%; margin-top: 15px; border-radius: 8px; overflow: hidden; }
+        #status { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 6px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>📷 ប្រព័ន្ធគ្រប់គ្រងវត្តមានបុគ្គលិក</h1>
-    <span class="version-badge">v2.1 Export Excel</span>
-</div>
+<div class="card">
+    <h2>ស្កេនវត្តមានធ្វើការ</h2>
+    
+    <label for="userName"><b>ឈ្មោះ ឬ ID បុគ្គលិក៖</b></label>
+    <input type="text" id="userName" placeholder="ឧទាហរណ៍៖ ស្រីរ៉ា ឬ លីកា">
 
-<div class="main-container">
-    <!-- ផ្នែក Scan -->
-    <div class="card">
-        <div class="card-title">📷 Scan ចុះវត្តមាន</div>
-        <label style="font-size: 0.85rem; color: #64748b;">ឈ្មោះ ឬ ID បុគ្គលិក</label>
-        <input type="text" id="userName" placeholder="បញ្ចូលឈ្មោះ ឬ ID...">
-        
-        <div id="reader"></div>
-        <div id="statusMsg" class="status-msg" style="display:none;"></div>
+    <div class="radio-group">
+        <label><input type="radio" name="actionType" value="Check-In" checked> ចូលធ្វើការ (Check-In)</label><br>
+        <label><input type="radio" name="actionType" value="Check-Out"> ចេញទៅផ្ទះ (Check-Out)</label>
     </div>
 
-    <!-- ផ្នែក ប្រវត្តិ Scan -->
-    <div class="card">
-        <div class="card-title" style="justify-content: space-between;">
-            <span>📋 ប្រវត្តិការ Scan វត្តមាន</span>
-            <button class="btn-excel">📊 ទាញយក Excel</button>
-        </div>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>បុគ្គលិក</th>
-                    <th>ពេលវេលា</th>
-                    <th>ចម្ងាយ GPS</th>
-                    <th>ស្ថានភាព</th>
-                </tr>
-            </thead>
-            <tbody id="historyList">
-                <tr>
-                    <td colspan="4" style="text-align: center; color: #94a3b8; padding: 20px;">មិនទាន់មានទិន្នន័យ Scan នៅឡើយទេ</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <div id="reader"></div>
+    <div id="status"></div>
 </div>
 
 <script>
-    const statusMsg = document.getElementById('statusMsg');
-
     const html5QrCode = new Html5Qrcode("reader");
+
+    function showStatus(msg, isSuccess) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerText = msg;
+        statusDiv.className = isSuccess ? 'success' : 'error';
+    }
+
+    function sendCheckin(userName, lat, lng, actionType, qrData) {
+        showStatus("កំពុងផ្ទៀងផ្ទាត់ទិន្នន័យ...", true);
+        
+        fetch('/api/checkin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userName: userName,
+                userLat: lat,
+                userLng: lng,
+                actionType: actionType,
+                qrCodeData: qrData
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            showStatus(data.message, data.success);
+        })
+        .catch(err => {
+            showStatus("មានបញ្ហាតភ្ជាប់ទៅកាន់ Server!", false);
+        });
+    }
+
     html5QrCode.start(
         { facingMode: "environment" }, 
         { fps: 10, qrbox: { width: 220, height: 220 } },
         (decodedText) => {
             const userName = document.getElementById('userName').value;
-            if (!userName) {
-                showStatus("សូមបញ្ចូលឈ្មោះ ឬ ID បុគ្គលិកជាមុនសិន!", false);
+            const actionType = document.querySelector('input[name="actionType"]:checked').value;
+
+            if (!userName || userName.trim() === "") {
+                showStatus("សូមវាយឈ្មោះ ឬ ID របស់អ្នកមុននឹងស្កេន!", false);
                 return;
             }
-            
+
             navigator.geolocation.getCurrentPosition((pos) => {
-                sendCheckin(userName, pos.coords.latitude, pos.coords.longitude);
+                sendCheckin(userName, pos.coords.latitude, pos.coords.longitude, actionType, decodedText);
             }, (err) => {
-                showStatus("សូមបើក GPS/Location លើទូរស័ព្ទ!", false);
+                showStatus("សូមបើក GPS/Location លើទូរស័ព្ទរបស់អ្នក!", false);
             });
         },
         () => {}
-    ).catch(err => {
-        showStatus("សូម Allow Camera លើ Safari/Chrome!", false);
-    });
-
-    function showStatus(text, isSuccess) {
-        statusMsg.style.display = "block";
-        statusMsg.className = "status-msg " + (isSuccess ? "success" : "error");
-        statusMsg.innerText = text;
-    }
-
-    function sendCheckin(userName, lat, lng) {
-        fetch('/api/checkin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userName, userLat: lat, userLng: lng })
-        })
-        .then(res => res.json())
-        .then(data => {
-            showStatus(data.message, data.success);
-        });
-    }
+    );
 </script>
 
 </body>
