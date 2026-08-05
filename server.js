@@ -1,122 +1,91 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const app = express();
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធស្កេនវត្តមានបុគ្គលិក</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { font-family: 'Kantumruy Pro', sans-serif; text-align: center; padding: 20px; background-color: #f4f6f9; }
+        .card { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input[type="text"] { width: 90%; padding: 10px; margin: 10px 0; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; }
+        .radio-group { margin: 15px 0; font-size: 16px; text-align: left; padding-left: 20px; }
+        #reader { width: 100%; margin-top: 15px; border-radius: 8px; overflow: hidden; }
+        #status { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 6px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
 
-app.use(cors());
-app.use(express.json());
-
-// 🔴 1. ដាក់ Google Sheet Web App URL របស់អ្នកត្រង់នេះ
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxDHFlgKX_wMpwM1PE3Mz1oepqLssvK0CsWzUvV1qGhQd2I0-CGUmr7td-tS_G0Vao49g/exec";
-
-// បញ្ជូន File index.html ទៅកាន់អ្នកប្រើប្រាស់ដោយស្វ័យប្រវត្តិ
-app.use(express.static(__dirname));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// ទីតាំង GPS ក្រុមហ៊ុន (អាចប្តូរ Coordinate តាមក្រោយបាន)
-const OFFICE_LAT = 11.5307426;
-const OFFICE_LNG = 104.9237006;
-const ALLOWED_METERS = 30;
-
-function getDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371e3;
-    const rad = Math.PI / 180;
-    const dLat = (lat2 - lat1) * rad;
-    const dLon = (lon2 - lon1) * rad;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * rad) * Math.cos(lat2 * rad) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-app.post('/api/checkin', async (req, res) => {
-    const { userName, userLat, userLng, actionType } = req.body;
+<div class="card">
+    <h2>ស្កេនវត្តមានធ្វើការ</h2>
     
-    // គណនាចម្ងាយ
-    const distance = getDistance(OFFICE_LAT, OFFICE_LNG, userLat, userLng);
+    <label for="userName"><b>ឈ្មោះ ឬ ID បុគ្គលិក៖</b></label>
+    <input type="text" id="userName" placeholder="ឧទាហរណ៍៖ ស្រីរ៉ា ឬ លីកា">
 
-    // ប្រសិនបើស្ថិតក្នុងរង្វង់ 10 ម៉ែត្រ
-    if (distance <= ALLOWED_METERS) {
-        try {
-            // បញ្ជូនទិន្នន័យទៅ Google Sheet
-            if (GOOGLE_SHEET_URL && !GOOGLE_SHEET_URL.includes("YOUR_ACTUAL_SCRIPT_ID")) {
-                await fetch(GOOGLE_SHEET_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userName,
-                        userLat,
-                        userLng,
-                        status: actionType || "វត្តមាន"
-                    })
-                });
+    <div class="radio-group">
+        <label><input type="radio" name="actionType" value="Check-In" checked> ចូលធ្វើការ (Check-In)</label><br>
+        <label><input type="radio" name="actionType" value="Check-Out"> ចេញទៅផ្ទះ (Check-Out)</label>
+    </div>
+
+    <div id="reader"></div>
+    <div id="status"></div>
+</div>
+
+<script>
+    const html5QrCode = new Html5Qrcode("reader");
+
+    function showStatus(msg, isSuccess) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerText = msg;
+        statusDiv.className = isSuccess ? 'success' : 'error';
+    }
+
+    function sendCheckin(userName, lat, lng, actionType, qrData) {
+        showStatus("កំពុងផ្ទៀងផ្ទាត់ទិន្នន័យ...", true);
+        
+        fetch('/api/checkin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userName: userName,
+                userLat: lat,
+                userLng: lng,
+                actionType: actionType,
+                qrCodeData: qrData
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            showStatus(data.message, data.success);
+        })
+        .catch(err => {
+            showStatus("មានបញ្ហាតភ្ជាប់ទៅកាន់ Server!", false);
+        });
+    }
+
+    html5QrCode.start(
+        { facingMode: "environment" }, 
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        (decodedText) => {
+            const userName = document.getElementById('userName').value;
+            const actionType = document.querySelector('input[name="actionType"]:checked').value;
+
+            if (!userName || userName.trim() === "") {
+                showStatus("សូមវាយឈ្មោះ ឬ ID របស់អ្នកមុននឹងស្កេន!", false);
+                return;
             }
 
-            return res.json({
-                success: true,
-                message: `ចុះវត្តមានជោគជ័យ! អ្នកនៅចម្ងាយ ${distance.toFixed(0)}m ពីក្រុមហ៊ុន។`
+            navigator.geolocation.getCurrentPosition((pos) => {
+                sendCheckin(userName, pos.coords.latitude, pos.coords.longitude, actionType, decodedText);
+            }, (err) => {
+                showStatus("សូមបើក GPS/Location លើទូរស័ព្ទរបស់អ្នក!", false);
             });
-        } catch (err) {
-            console.error("Sheet Error:", err);
-            return res.status(500).json({ success: false, message: "មានបញ្ហាក្នុងការបញ្ជូនទៅ Google Sheet!" });
-        }
-    } else {
-        // បើនៅឆ្ងាយលើស ៣០ ម៉ែត្រ
-        return res.status(400).json({
-            success: false,
-            message: `បរាជ័យ! អ្នកនៅឆ្ងាយពីក្រុមហ៊ុនពេក (${(distance/1000).toFixed(2)} km)`
-        });
-    }
-});
+        },
+        () => {}
+    );
+</script>
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-// កូដសម្គាល់ QR Code ដែលអ្នកបាន Print បិទនៅច្រកទ្វារ
-const VALID_QR_CODE = "COMPANY_OFFICE_QR_2026";
-
-app.post('/api/checkin', async (req, res) => {
-    const { userName, userLat, userLng, actionType, qrCodeData } = req.body;
-    
-    // ១. ផ្ទៀងផ្ទាត់ QR Code
-    if (qrCodeData !== VALID_QR_CODE) {
-        return res.status(400).json({
-            success: false,
-            message: "QR Code មិនត្រឹមត្រូវ! សូមស្កេន QR Code ក្រុមហ៊ុននៅច្រកទ្វារ។"
-        });
-    }
-
-    // ២. ផ្ទៀងផ្ទាត់ GPS ចម្ងាយ
-    const distance = getDistance(OFFICE_LAT, OFFICE_LNG, userLat, userLng);
-
-    if (distance <= ALLOWED_METERS) {
-        try {
-            if (GOOGLE_SHEET_URL && !GOOGLE_SHEET_URL.includes("YOUR_ACTUAL_SCRIPT_ID")) {
-                await fetch(GOOGLE_SHEET_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userName,
-                        userLat,
-                        userLng,
-                        status: actionType || "Check-In"
-                    })
-                });
-            }
-
-            return res.json({
-                success: true,
-                message: `ចុះវត្តមាន ${actionType} ជោគជ័យ! (${distance.toFixed(0)}m ពីក្រុមហ៊ុន)`
-            });
-        } catch (err) {
-            return res.status(500).json({ success: false, message: "មានបញ្ហាក្នុងការបញ្ជូនទៅ Google Sheet!" });
-        }
-    } else {
-        return res.status(400).json({
-            success: false,
-            message: `បរាជ័យ! អ្នកនៅឆ្ងាយពីក្រុមហ៊ុនពេក (${(distance/1000).toFixed(2)} km)`
-        });
-    }
-});
+</body>
+</html>
