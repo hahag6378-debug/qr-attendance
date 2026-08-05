@@ -2,112 +2,99 @@
 <html lang="km">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ប្រព័ន្ធស្កេនវត្តមានទំនើប</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ប្រព័ន្ធស្កេនវត្តមាន</title>
     
-    <!-- Link ទៅហ្វុងអក្សរ SF Pro របស់ Apple -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap">
-    <!-- Link ទៅហ្វុងខ្មែរ Kantumruy Pro ដើម្បីឱ្យអក្សរខ្មែរស្អាតស៊ីគ្នា -->
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Import Font Kantumruy Pro ផ្លូវការ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
-    <!-- Link ទៅ Library ស្កេន QR -->
     <script src="https://unpkg.com/html5-qrcode"></script>
     
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Kantumruy Pro', sans-serif !important;
+        }
+
         :root {
             --ios-bg: #F2F2F7;
-            --ios-card-bg: rgba(255, 255, 255, 0.8);
-            --ios-primary: #007AFF; /* ពណ៌ខៀវ iPhone */
-            --ios-success: #34C759; /* ពណ៌បៃតង iPhone */
-            --ios-error: #FF3B30;   /* ពណ៌ក្រហម iPhone */
-            --ios-text: #000000;
-            --ios-text-secondary: #8E8E93;
-            --font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Kantumruy Pro', sans-serif;
+            --ios-card-bg: #FFFFFF;
+            --ios-primary: #007AFF;
+            --ios-success: #34C759;
+            --ios-error: #FF3B30;
+            --ios-text: #1C1C1E;
+            --ios-text-sub: #8E8E93;
         }
 
         body { 
-            font-family: var(--font-family);
             margin: 0; 
             padding: 0; 
             background-color: var(--ios-bg);
             color: var(--ios-text);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
             display: flex;
             justify-content: center;
             min-height: 100vh;
-            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .ios-container {
             width: 100%;
-            max-width: 375px; /* ទំហំអេក្រង់ iPhone SE/8 */
-            padding: 20px;
+            max-width: 400px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
 
-        /* ផ្នែកក្បាល (Header) */
         .ios-header {
             text-align: center;
-            padding: 10px 0;
+            padding: 8px 0;
         }
 
         h2 { 
-            font-weight: 600; 
-            font-size: 20px; 
-            margin: 0;
-            letter-spacing: -0.5px;
+            font-weight: 700; 
+            font-size: 22px; 
+            margin: 0 0 4px 0;
         }
 
         .ios-subtitle {
             font-size: 14px;
-            color: var(--ios-text-secondary);
-            margin-top: 5px;
+            color: var(--ios-text-sub);
         }
 
-        /* ប្រអប់បញ្ចូលឈ្មោះ */
         .ios-group {
             background-color: var(--ios-card-bg);
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 16px;
-            border: 1px solid rgba(0,0,0,0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
-        label {
+        label.field-label {
             font-weight: 600;
             font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--ios-text-secondary);
+            color: var(--ios-text-sub);
             display: block;
             margin-bottom: 8px;
         }
 
         input[type="text"] { 
             width: 100%; 
-            padding: 12px; 
+            padding: 14px; 
             font-size: 16px; 
-            background-color: rgba(239, 239, 244, 0.8);
-            border: none;
-            border-radius: 10px; 
-            box-sizing: border-box; 
-            font-family: var(--font-family);
-            -webkit-appearance: none;
-        }
-
-        input[type="text"]::placeholder {
-            color: #C7C7CC;
+            background-color: #F2F2F7;
+            border: 1px solid transparent;
+            border-radius: 12px; 
+            outline: none;
+            transition: all 0.2s;
         }
 
         input[type="text"]:focus {
-            outline: 2px solid var(--ios-primary);
+            background-color: #FFFFFF;
+            border-color: var(--ios-primary);
         }
 
-        /* ផ្នែកជ្រើសរើស Check-In/Out */
+        /* Radio Buttons */
         .ios-action-group {
             display: flex;
             gap: 12px;
@@ -131,102 +118,76 @@
             align-items: center;
             justify-content: center;
             background-color: var(--ios-card-bg);
-            padding: 20px;
-            border-radius: 14px;
+            padding: 16px 8px;
+            border-radius: 16px;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: all 0.1s ease-in-out;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            font-weight: 500;
-            text-align: center;
-            font-size: 14px;
-            margin: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            font-weight: 600;
+            font-size: 13px;
             color: var(--ios-text);
         }
 
         .ios-icon {
-            font-size: 28px;
-            margin-bottom: 8px;
+            font-size: 26px;
+            margin-bottom: 6px;
         }
 
-        /* ស្ទីលពេលជ្រើសរើស (iOS Primary Color) */
         .ios-action-option input[type="radio"]:checked + label {
             border-color: var(--ios-primary);
-            background-color: rgba(0, 122, 255, 0.05);
-            color: var(--ios-primary);
-            box-shadow: 0 0 15px rgba(0, 122, 255, 0.15);
-        }
-
-        .ios-action-option input[type="radio"]:checked + label .ios-icon {
+            background-color: rgba(0, 122, 255, 0.06);
             color: var(--ios-primary);
         }
 
-        /* ផ្នែកស្កេន QR */
-        #ios-reader-container {
+        /* Scanner Box - កែសម្រួលមិនឱ្យរញ៉េរញ៉ៃ */
+        .scanner-wrapper {
             position: relative;
+            width: 100%;
+            height: 280px;
             background-color: #000;
             border-radius: 14px;
             overflow: hidden;
-            width: 100%;
-            padding-bottom: 100%; /* សមាមាត្រ 1:1 Square */
         }
 
         #reader { 
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
         }
 
-        /* ជ្រុងៗពណ៌ស Focus Box ដូច Apple QR Scanner */
-        .ios-qr-focus-box {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            pointer-events: none;
-            z-index: 10;
+        #reader video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
         }
 
-        .ios-focus-corner {
-            position: absolute;
-            width: 25px;
-            height: 25px;
-            border-color: #fff;
-            border-style: solid;
+        /* លាក់ elements លើសរបស់ library */
+        #reader__scan_region {
+            background: transparent !important;
+        }
+        #reader__dashboard {
+            display: none !important;
         }
 
-        .top-left { top: 0; left: 0; border-width: 4px 0 0 4px; border-top-left-radius: 4px; }
-        .top-right { top: 0; right: 0; border-width: 4px 4px 0 0; border-top-right-radius: 4px; }
-        .bottom-left { bottom: 0; left: 0; border-width: 0 0 4px 4px; border-bottom-left-radius: 4px; }
-        .bottom-right { bottom: 0; right: 0; border-width: 0 4px 4px 0; border-bottom-right-radius: 4px; }
-
-        /* ផ្នែកស្ថានភាព (Status Area) */
+        /* Status Container */
         #ios-status-container {
-            margin-top: 10px;
-            min-height: 50px;
+            min-height: 48px;
         }
 
         #status { 
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 16px; 
-            border-radius: 14px; 
-            font-size: 15px;
-            font-weight: 500;
+            gap: 10px;
+            padding: 14px 16px; 
+            border-radius: 12px; 
+            font-size: 14px;
+            font-weight: 600;
             display: none;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
 
-        .success { background-color: rgba(52, 199, 89, 0.1); color: var(--ios-success); border: 1px solid rgba(52, 199, 89, 0.2); }
-        .error { background-color: rgba(255, 59, 48, 0.1); color: var(--ios-error); border: 1px solid rgba(255, 59, 48, 0.2); }
-        .loading { background-color: rgba(0, 122, 255, 0.08); color: var(--ios-primary); border: 1px solid rgba(0, 122, 255, 0.15); }
+        .success { background-color: rgba(52, 199, 89, 0.12); color: var(--ios-success); }
+        .error { background-color: rgba(255, 59, 48, 0.12); color: var(--ios-error); }
+        .loading { background-color: rgba(0, 122, 255, 0.12); color: var(--ios-primary); }
 
     </style>
 </head>
@@ -234,41 +195,35 @@
 
 <div class="ios-container">
     <div class="ios-header">
-        <h2>ចុះវត្តមាន QR Code</h2>
-        <div class="ios-subtitle">សូមស្កេន QR Code ក្នុងហាង</div>
+        <h2>ចុះវត្តមានធ្វើការ</h2>
+        <div class="ios-subtitle">សូមស្កេន QR Code ដើមី្បកត់ត្រា</div>
     </div>
     
     <div class="ios-group">
-        <label for="userName">ឈ្មោះ ឬ ID បុគ្គលិក</label>
-        <input type="text" id="userName" placeholder="ឧ. លីកា">
+        <label class="field-label" for="userName">ឈ្មោះ ឬ ID បុគ្គលិក</label>
+        <input type="text" id="userName" placeholder="បញ្ចូលឈ្មោះ ឬ ID...">
     </div>
 
     <div class="ios-action-group">
         <div class="ios-action-option">
             <input type="radio" name="actionType" value="Check-In" id="checkin" checked>
             <label for="checkin">
-                <span class="ios-icon">👍</span> <!-- SF Symbol: ThumbUp -->
+                <span class="ios-icon">👍</span>
                 ចូល (Check-In)
             </label>
         </div>
         <div class="ios-action-option">
             <input type="radio" name="actionType" value="Check-Out" id="checkout">
             <label for="checkout">
-                <span class="ios-icon">🏠</span> <!-- SF Symbol: Home -->
+                <span class="ios-icon">🏠</span>
                 ចេញ (Check-Out)
             </label>
         </div>
     </div>
 
-    <div class="ios-group" style="padding: 10px;">
-        <label>កាមេរ៉ាស្កេន</label>
-        <div id="ios-reader-container">
-            <div class="ios-qr-focus-box">
-                <div class="ios-focus-corner top-left"></div>
-                <div class="ios-focus-corner top-right"></div>
-                <div class="ios-focus-corner bottom-left"></div>
-                <div class="ios-focus-corner bottom-right"></div>
-            </div>
+    <div class="ios-group" style="padding: 12px;">
+        <label class="field-label">កាមេរ៉ាស្កេន</label>
+        <div class="scanner-wrapper">
             <div id="reader"></div>
         </div>
     </div>
@@ -291,7 +246,7 @@
         
         statusDiv.style.display = 'flex';
         statusText.innerText = msg;
-        statusDiv.className = type; // success, error, loading
+        statusDiv.className = type;
 
         if (type === 'success') { statusIcon.innerText = '✅'; }
         else if (type === 'error') { statusIcon.innerText = '❌'; }
@@ -321,10 +276,16 @@
         });
     }
 
-    // ចាប់ផ្តើមស្កេន
+    // កំណត់ទំហំស្កេនឱ្យល្មម
+    const config = { 
+        fps: 10, 
+        qrbox: { width: 200, height: 200 },
+        aspectRatio: 1.0
+    };
+
     html5QrCode.start(
         { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 200, height: 200 } },
+        config,
         (decodedText) => {
             const userName = document.getElementById('userName').value;
             const actionType = document.querySelector('input[name="actionType"]:checked').value;
@@ -334,14 +295,13 @@
                 return;
             }
 
-            // សុំសិទ្ធិបើក GPS
             navigator.geolocation.getCurrentPosition((pos) => {
                 sendCheckin(userName, pos.coords.latitude, pos.coords.longitude, actionType, decodedText);
             }, (err) => {
                 showStatus("សូមបើក GPS/Location លើទូរស័ព្ទរបស់អ្នក!", 'error');
             });
         },
-        () => { /* កុំធ្វើអ្វីពេលកំពុងស្វែងរក QR */ }
+        () => {}
     );
 </script>
 
