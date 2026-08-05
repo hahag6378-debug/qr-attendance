@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Attendance System</title>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Libraries for PDF & Excel Export -->
+    <!-- Libraries សម្រាប់ Export PDF & Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -30,9 +30,9 @@
         }
 
         .brand { display: flex; align-items: center; gap: 12px; }
-        .logo-svg { width: 42px; height: 42px; }
-        .brand-text h1 { margin: 0; font-size: 18px; font-weight: 700; color: #0F172A; }
-        .brand-text p { margin: 0; font-size: 12px; color: #64748B; }
+        .logo-svg { width: 44px; height: 44px; flex-shrink: 0; }
+        .brand-text h1 { margin: 0; font-size: 18px; font-weight: 700; color: #0F172A; line-height: 1.2; }
+        .brand-text p { margin: 2px 0 0 0; font-size: 12px; color: #64748B; }
 
         .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
         
@@ -46,7 +46,7 @@
             margin-bottom: 24px; 
         }
 
-        /* Action Buttons */
+        /* Action Bar */
         .action-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         .btn-group { display: flex; gap: 10px; }
         
@@ -66,7 +66,7 @@
 
         .btn-excel { background: #10B981; color: white; }
         .btn-pdf { background: #EF4444; color: white; }
-        .btn-orange { background: #F15A24; color: white; }
+        .btn-orange { background: #F16522; color: white; }
         .btn-logout { background: #F1F5F9; color: #64748B; border: 1px solid #CBD5E1; }
         .btn-logout:hover { background: #E2E8F0; color: #0F172A; }
 
@@ -83,10 +83,10 @@
             font-size: 15px;
             transition: border 0.2s;
         }
-        input[type="password"]:focus { border-color: #F15A24; }
+        input[type="password"]:focus { border-color: #F16522; }
 
         /* Modern Table */
-        .table-responsive { overflow-x: auto; margin-top: 15px; }
+        .table-responsive { overflow-x: auto; margin-top: 10px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
         th { 
             background: #F8FAFC; 
@@ -117,10 +117,18 @@
 
 <header>
     <div class="brand">
-        <!-- SVG Logo vector matching the brand logo -->
-        <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M43.75 87.5C67.9125 87.5 87.5 67.9125 87.5 43.75C87.5 19.5875 67.9125 0 43.75 0C19.5875 0 0 19.5875 0 43.75C0 67.9125 19.5875 87.5 43.75 87.5ZM43.75 56.25C50.6536 56.25 56.25 50.6536 56.25 43.75C56.25 36.8464 50.6536 31.25 43.75 31.25C36.8464 31.25 31.25 36.8464 31.25 43.75C31.25 50.6536 36.8464 56.25 43.75 56.25Z" fill="#F15A24"/>
-            <circle cx="87.5" cy="43.75" r="15.625" fill="#F15A24"/>
+        <!-- SVG Logo ផ្លូវការរបស់បង -->
+        <svg class="logo-svg" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#F16522" d="M403.75,289.1c-12.38-12.39-19.18-28.47-19.15-45.27c0.05-31.64,24.14-58.48,55.25-63.39
+                c-10.47-30.2-27.76-57.4-51.84-81.59C345.37,56.02,293.31,34.6,231.84,34.6c-61.29,0-113.26,21.42-155.9,64.24
+                c-42.64,42.83-63.95,95.08-63.95,156.73c0,61.85,21.32,114.29,63.95,157.29c42.64,43.02,94.61,64.52,155.9,64.52
+                c61.47,0,113.53-21.5,156.17-64.52c29.93-30.18,49.35-65.01,58.28-104.48C430.61,307.56,415.26,300.63,403.75,289.1z
+                M262.48,276.24c-8.06,8.54-18.28,12.8-30.64,12.8c-12.19,0-22.31-4.26-30.37-12.8c-8.06-8.52-12.09-19.26-12.09-32.18
+                c0-12.94,4.03-23.66,12.09-32.19c8.06-8.53,18.18-12.79,30.37-12.79c12.37,0,22.58,4.26,30.64,12.79
+                c8.06,8.53,12.08,19.26,12.08,32.19C274.56,256.98,270.54,267.72,262.48,276.24z"/>
+            <path fill="#F16522" d="M500.01,244.2c-0.18,25.42-19.36,46.64-43.9,49.93c-1.98,0.27-3.99,0.41-6.04,0.44c-0.37,0-0.76,0-1.13-0.01
+                c-27.1-0.31-50.48-23.67-50.44-50.71c0.04-25.23,20.24-46.92,45.51-49.96c1.57-0.19,3.16-0.3,4.76-0.34
+                c1.07-0.03,2.14-0.02,3.19,0.03C478.5,194.61,500.19,217.1,500.01,244.2z"/>
         </svg>
         <div class="brand-text">
             <h1>ATTENDANCE ADMIN</h1>
@@ -135,9 +143,17 @@
 <div class="container">
     <!-- 🔐 ផ្ទាំង Login Admin -->
     <div id="login-section" class="card login-box">
-        <svg class="logo-svg" style="width: 60px; height: 60px; margin-bottom: 12px;" viewBox="0 0 100 100" fill="none">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M43.75 87.5C67.9125 87.5 87.5 67.9125 87.5 43.75C87.5 19.5875 67.9125 0 43.75 0C19.5875 0 0 19.5875 0 43.75C0 67.9125 19.5875 87.5 43.75 87.5ZM43.75 56.25C50.6536 56.25 56.25 50.6536 56.25 43.75C56.25 36.8464 50.6536 31.25 43.75 31.25C36.8464 31.25 31.25 36.8464 31.25 43.75C31.25 50.6536 36.8464 56.25 43.75 56.25Z" fill="#F15A24"/>
-            <circle cx="87.5" cy="43.75" r="15.625" fill="#F15A24"/>
+        <svg class="logo-svg" style="width: 70px; height: 70px; margin-bottom: 12px;" viewBox="0 0 512 512" fill="none">
+            <path fill="#F16522" d="M403.75,289.1c-12.38-12.39-19.18-28.47-19.15-45.27c0.05-31.64,24.14-58.48,55.25-63.39
+                c-10.47-30.2-27.76-57.4-51.84-81.59C345.37,56.02,293.31,34.6,231.84,34.6c-61.29,0-113.26,21.42-155.9,64.24
+                c-42.64,42.83-63.95,95.08-63.95,156.73c0,61.85,21.32,114.29,63.95,157.29c42.64,43.02,94.61,64.52,155.9,64.52
+                c61.47,0,113.53-21.5,156.17-64.52c29.93-30.18,49.35-65.01,58.28-104.48C430.61,307.56,415.26,300.63,403.75,289.1z
+                M262.48,276.24c-8.06,8.54-18.28,12.8-30.64,12.8c-12.19,0-22.31-4.26-30.37-12.8c-8.06-8.52-12.09-19.26-12.09-32.18
+                c0-12.94,4.03-23.66,12.09-32.19c8.06-8.53,18.18-12.79,30.37-12.79c12.37,0,22.58,4.26,30.64,12.79
+                c8.06,8.53,12.08,19.26,12.08,32.19C274.56,256.98,270.54,267.72,262.48,276.24z"/>
+            <path fill="#F16522" d="M500.01,244.2c-0.18,25.42-19.36,46.64-43.9,49.93c-1.98,0.27-3.99,0.41-6.04,0.44c-0.37,0-0.76,0-1.13-0.01
+                c-27.1-0.31-50.48-23.67-50.44-50.71c0.04-25.23,20.24-46.92,45.51-49.96c1.57-0.19,3.16-0.3,4.76-0.34
+                c1.07-0.03,2.14-0.02,3.19,0.03C478.5,194.61,500.19,217.1,500.01,244.2z"/>
         </svg>
         <h2 style="margin: 0 0 6px 0;">ចូលប្រព័ន្ធ Admin</h2>
         <p style="color: #64748B; margin: 0; font-size: 14px;">សូមវាយបញ្ចូលលេខកូដសម្ងាត់</p>
@@ -284,7 +300,7 @@
             body: tableRows,
             startY: 25,
             theme: 'grid',
-            headStyles: { fillColor: [241, 90, 36] }
+            headStyles: { fillColor: [241, 101, 34] }
         });
 
         doc.save(`Attendance_Report_${new Date().toISOString().slice(0,10)}.pdf`);
