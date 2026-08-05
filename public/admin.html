@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ផ្ទាំងគ្រប់គ្រង Admin (Dashboard)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif !important; }
+        body { margin: 0; padding: 20px; background-color: #F2F2F7; color: #1C1C1E; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h2 { margin-top: 0; color: #007AFF; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #E5E5EA; padding: 12px; text-align: left; }
+        th { background-color: #F2F2F7; color: #1C1C1E; }
+        .btn { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; }
+        .btn-pdf { background: #FF3B30; color: white; }
+        .btn-login { background: #007AFF; color: white; width: 100%; padding: 12px; }
+        input[type="password"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #CCC; margin: 10px 0; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- ផ្ទាំង Login សម្រាប់ Admin -->
+    <div id="login-section" class="card" style="max-width: 400px; margin: 50px auto;">
+        <h2>🔐 ចូលប្រព័ន្ធ Admin</h2>
+        <p>សូមវាយបញ្ចូលលេខកូដសម្ងាត់ Admin:</p>
+        <input type="password" id="adminPass" placeholder="បញ្ចូល Password...">
+        <button onclick="loginAdmin()" class="btn btn-login">Login</button>
+        <p id="loginErr" style="color: red; display: none; margin-top: 10px;">Password មិនត្រឹមត្រូវ!</p>
+    </div>
+
+    <!-- ផ្ទាំង Dashboard បង្ហាញទិន្នន័យ -->
+    <div id="dashboard-section" style="display: none;">
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2>📊 របាយការណ៍វត្តមានបុគ្គលិក</h2>
+                <p style="margin: 0; color: #666;">ទិន្នន័យស្កេនវត្តមានទាំងអស់</p>
+            </div>
+            <div>
+                <button onclick="downloadPDF()" class="btn btn-pdf">📄 ទាញយក PDF</button>
+                <button onclick="logout()" class="btn" style="background: #8E8E93; color: white;">Logout</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ឈ្មោះ / ID បុគ្គលិក</th>
+                        <th>សកម្មភាព</th>
+                        <th>ចម្ងាយ (ម៉ែត្រ)</th>
+                        <th>កាលបរិច្ឆេទ & ពេលវេលា</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTable">
+                    <tr><td colspan="5" style="text-align:center;">កំពុងទាញយកទិន្នន័យ...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 🔑 លេខកូដសម្ងាត់ Admin (អាចដូរបាន)
+    const ADMIN_PASSWORD = "admin123456";
+
+    function loginAdmin() {
+        const inputPass = document.getElementById('adminPass').value;
+        if (inputPass === ADMIN_PASSWORD) {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('dashboard-section').style.display = 'block';
+            loadAttendance();
+        } else {
+            document.getElementById('loginErr').style.display = 'block';
+        }
+    }
+
+    function logout() {
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('dashboard-section').style.display = 'none';
+        document.getElementById('adminPass').value = '';
+    }
+
+    function loadAttendance() {
+        fetch('/api/export-data')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('attendanceTable');
+                tbody.innerHTML = '';
+                
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">មិនទាន់មានទិន្នន័យស្កេននៅឡើយទេ</td></tr>';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const row = `<tr>
+                        <td>${item.id}</td>
+                        <td><b>${item.userName}</b></td>
+                        <td style="color: ${item.actionType === 'Check-In' ? 'green' : 'orange'}; font-weight:bold;">${item.actionType}</td>
+                        <td>${item.distance}</td>
+                        <td>${item.timestamp}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+
+    function downloadPDF() {
+        fetch('/api/export-data')
+            .then(res => res.json())
+            .then(data => {
+                if (data.length === 0) return alert("គ្មានទិន្នន័យសម្រាប់ទាញយកទេ!");
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.setFontSize(16);
+                doc.text("Attendance Summary Report", 14, 15);
+                
+                const tableColumn = ["ID", "Name / ID", "Action", "Distance", "Date Time"];
+                const tableRows = data.map(item => [item.id, item.userName, item.actionType, item.distance, item.timestamp]);
+
+                doc.autoTable({
+                    head: [tableColumn],
+                    body: tableRows,
+                    startY: 25,
+                    theme: 'grid',
+                    headStyles: { fillColor: [0, 122, 255] }
+                });
+
+                doc.save(`Attendance_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+            });
+    }
+</script>
+
+</body>
+</html>
