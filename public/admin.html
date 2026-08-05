@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Advanced Attendance System</title>
-    <!-- បន្ថែមបន្ទាត់នេះនៅក្នុងផ្នែក <head> -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%23F16522' d='M403.75,289.1c-12.38-12.39-19.18-28.47-19.15-45.27c0.05-31.64,24.14-58.48,55.25-63.39c-10.47-30.2-27.76-57.4-51.84-81.59C345.37,56.02,293.31,34.6,231.84,34.6c-61.29,0-113.26,21.42-155.9,64.24c-42.64,42.83-63.95,95.08-63.95,156.73c0,61.85,21.32,114.29,63.95,157.29c42.64,43.02,94.61,64.52,155.9,64.52c61.47,0,113.53-21.5,156.17-64.52c29.93-30.18,49.35-65.01,58.28-104.48C430.61,307.56,415.26,300.63,403.75,289.1z M262.48,276.24c-8.06,8.54-18.28,12.8-30.64,12.8c-12.19,0-22.31-4.26-30.37-12.8c-8.06-8.52-12.09-19.26-12.09-32.18c0-12.94,4.03-23.66,12.09-32.19c8.06-8.53,18.18-12.79,30.37-12.79c12.37,0,22.58,4.26,30.64,12.79c8.06,8.53,12.08,19.26,12.08,32.19C274.56,256.98,270.54,267.72,262.48,276.24z'/><path fill='%23F16522' d='M500.01,244.2c-0.18,25.42-19.36,46.64-43.9,49.93c-1.98,0.27-3.99,0.41-6.04,0.44c-0.37,0-0.76,0-1.13-0.01c-27.1-0.31-50.48-23.67-50.44-50.71c0.04-25.23,20.24-46.92,45.51-49.96c1.57-0.19,3.16-0.3,4.76-0.34c1.07-0.03,2.14-0.02,3.19,0.03C478.5,194.61,500.19,217.1,500.01,244.2z'/></svg>">
+    <title>Admin Dashboard - Attendance System</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%23F16522' d='M403.75,289.1c-12.38-12.39-19.18-28.47-19.15-45.27c0.05-31.64,24.14-58.48,55.25-63.39c-10.47-30.2-27.76-57.4-51.84-81.59C345.37,56.02,293.31,34.6,231.84,34.6c-61.29,0-113.26,21.42-155.9,64.24c-42.64,42.83-63.95,95.08-63.95,156.73c0,61.85,21.32,114.29,63.95,157.29c42.64,43.02,94.61,64.52,155.9,64.52c61.47,0,113.53-21.5,156.17-64.52c29.93-30.18,49.35-65.01,58.28-104.48C430.61,307.56,415.26,300.63,403.75,289.1z M262.48,276.24c-8.06,8.54-18.28,12.8-30.64,12.8c-12.19,0-22.31-4.26-30.37-12.8c-8.06-8.52-12.09-19.26-12.09-32.18c0-12.94,4.03-23.66,12.09-32.19c8.06-8.53,18.18-12.79,30.37-12.79c12.37,0,22.58,4.26,30.64,12.79c8.06,8.53,12.08,19.26,12.08,32.19C274.56,256.98,270.54,267.72,262.48,276.24z'/><path fill='%23F16522' d='M500.01,244.2c-0.18,25.42-19.36,46.64-43.9,49.93c-1.98,0.27-3.99,0.41-6.04,0.44c-0.37,0-0.76,0-1.13-0.01c-27.1-0.31-50.48-23.67-50.44-50.71c0.04-25.23,20.24-46.92,45.51-49.96c1.57-0.19,3.16-0.3,4.76-0.34c1.07-0.03,2.14-0.02,3.19,0.03C478.5,194.61,500.19,217.1,500.01,244.2z'/></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -24,8 +23,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0; z-index: 100;
+            position: sticky; top: 0; z-index: 100;
         }
 
         .brand { display: flex; align-items: center; gap: 12px; }
@@ -36,7 +34,6 @@
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         .card { background: white; border-radius: 16px; border: 1px solid #E2E8F0; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); padding: 24px; margin-bottom: 24px; }
 
-        /* Grid layouts */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
         .stat-card { background: white; border-radius: 14px; border: 1px solid #E2E8F0; padding: 18px; display: flex; align-items: center; gap: 16px; }
         .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
@@ -44,7 +41,6 @@
         .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
         @media(max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
 
-        /* Buttons & Inputs */
         .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-excel { background: #10B981; color: white; }
@@ -57,7 +53,6 @@
 
         .filter-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
 
-        /* Tables */
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
         th { background: #F8FAFC; color: #475569; font-weight: 600; font-size: 13px; padding: 12px 16px; text-align: left; border-bottom: 2px solid #E2E8F0; }
@@ -88,17 +83,13 @@
 </header>
 
 <div class="container">
-    <!-- Login Section -->
     <div id="login-section" class="card" style="max-width: 380px; margin: 80px auto; text-align: center;">
         <h2>🔐 ចូលប្រព័ន្ធ Admin</h2>
         <input type="password" id="adminPass" placeholder="បញ្ចូល Password..." style="width:100%; margin:15px 0;">
         <button onclick="loginAdmin()" class="btn btn-orange" style="width:100%; justify-content:center;">Login</button>
     </div>
 
-    <!-- Dashboard Content -->
     <div id="dashboard-section" style="display: none;">
-        
-        <!-- Feature 1: Live Analytics Cards -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon" style="background:#DBEAFE; color:#1D4ED8;"><i data-lucide="users"></i></div>
@@ -119,7 +110,6 @@
         </div>
 
         <div class="grid-2">
-            <!-- Attendance Table & Filters -->
             <div>
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
@@ -130,7 +120,6 @@
                         </div>
                     </div>
 
-                    <!-- Feature 2: Filter & Date Picker -->
                     <div class="filter-bar">
                         <input type="text" id="searchName" placeholder="🔍 ស្វែងរកឈ្មោះ/ID..." onkeyup="applyFilter()">
                         <input type="date" id="startDate" onchange="applyFilter()">
@@ -152,47 +141,10 @@
                         </table>
                     </div>
                 </div>
-
-                <!-- Feature 3: Leave & Request Management -->
-                <div class="card">
-                    <h3 style="margin-top:0;">📩 ពាក្យសុំច្បាប់ & កែតម្រូវវត្តមាន</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>បុគ្គលិក</th>
-                                    <th>ប្រភេទ</th>
-                                    <th>មូលហេតុ</th>
-                                    <th>ស្ថានភាព</th>
-                                    <th>សកម្មភាព</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leaveTable">
-                                <tr>
-                                    <td><b>Sok Dara</b></td>
-                                    <td>សុំច្បាប់ឈប់សម្រាក</td>
-                                    <td>គ្រុនផ្តាសាយ</td>
-                                    <td><span class="badge badge-pending">រង់ចាំ</span></td>
-                                    <td>
-                                        <button onclick="approveLeave(this, true)" class="btn btn-excel" style="padding:4px 8px; font-size:12px;">Approve</button>
-                                        <button onclick="approveLeave(this, false)" class="btn btn-pdf" style="padding:4px 8px; font-size:12px;">Reject</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
 
-            <!-- Side Panel: Settings & Visual Chart -->
             <div>
-                <!-- Analytics Chart -->
-                <div class="card">
-                    <h3 style="margin-top:0;">📊 ក្រាហ្វវត្តមានប្រចាំសប្តាហ៍</h3>
-                    <canvas id="attendanceChart" height="200"></canvas>
-                </div>
-
-                <!-- Feature 4 & 5: Shift Schedule & Telegram Setting -->
+                <!-- ⚙️ ផ្ទាំងកំណត់រចនាសម្ព័ន្ធប្រព័ន្ធ (Fixed Settings) -->
                 <div class="card">
                     <h3 style="margin-top:0;">⚙️ កំណត់រចនាសម្ព័ន្ធប្រព័ន្ធ</h3>
                     
@@ -214,7 +166,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -224,17 +175,45 @@
     let originalData = [];
     let filteredData = [];
 
+    // 🟢 ហៅអនុគមន៍ស្វ័យប្រវត្តិពេលទំព័រ Load
+    window.onload = function() {
+        loadSettings();
+    };
+
     function loginAdmin() {
         if (document.getElementById('adminPass').value === ADMIN_PASSWORD) {
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('dashboard-section').style.display = 'block';
             document.getElementById('header-logout').style.display = 'block';
             loadData();
-            initChart();
+            loadSettings(); // 👈 ធានាថាតម្លៃ Setting បង្ហាញថេរ
         } else alert("Password មិនត្រឹមត្រូវ!");
     }
 
     function logout() { location.reload(); }
+
+    // 🟢 រក្សាទុកតម្លៃក្នុង localStorage មិនឱ្យបាត់ពេល Refresh
+    function saveSettings() {
+        const shift = document.getElementById('shiftTime').value;
+        const radius = document.getElementById('gpsRadius').value;
+        const botToken = document.getElementById('tgToken').value;
+        const chatId = document.getElementById('tgChatId').value;
+
+        localStorage.setItem('config_shift', shift);
+        localStorage.setItem('config_radius', radius);
+        localStorage.setItem('config_tgToken', botToken);
+        localStorage.setItem('config_tgChatId', chatId);
+
+        alert("រក្សាទុកការកំណត់ជោគជ័យ! ទិន្នន័យនឹងមិនបាត់បង់ទេពេល Refresh។");
+    }
+
+    // 🟢 ទាញតម្លៃចាស់ពី localStorage មកបង្ហាញក្នុង Input វិញ
+    function loadSettings() {
+        if(localStorage.getItem('config_shift')) document.getElementById('shiftTime').value = localStorage.getItem('config_shift');
+        if(localStorage.getItem('config_radius')) document.getElementById('gpsRadius').value = localStorage.getItem('config_radius');
+        if(localStorage.getItem('config_tgToken')) document.getElementById('tgToken').value = localStorage.getItem('config_tgToken');
+        if(localStorage.getItem('config_tgChatId')) document.getElementById('tgChatId').value = localStorage.getItem('config_tgChatId');
+    }
 
     function loadData() {
         fetch('/api/export-data')
@@ -243,7 +222,7 @@
                 originalData = data;
                 filteredData = data;
                 renderTable(filteredData);
-                updateStats(filteredData);
+                document.getElementById('stat-total').innerText = data.length;
             });
     }
 
@@ -259,101 +238,6 @@
                 <td style="font-size:12px; color:#64748B;">${item.timestamp}</td>
             </tr>`;
         });
-    }
-
-    function updateStats(data) {
-        document.getElementById('stat-total').innerText = data.length;
-        document.getElementById('stat-ontime').innerText = data.filter(d => d.actionType === 'Check-In').length;
-        document.getElementById('stat-late').innerText = data.filter(d => d.actionType === 'Check-Out').length;
-        document.getElementById('stat-leave').innerText = "1";
-    }
-
-    // Filter Functionality
-    function applyFilter() {
-        const query = document.getElementById('searchName').value.toLowerCase();
-        const start = document.getElementById('startDate').value;
-        const end = document.getElementById('endDate').value;
-
-        filteredData = originalData.filter(item => {
-            const matchName = item.userName.toLowerCase().includes(query);
-            const itemDate = item.timestamp.split('T')[0];
-            const matchStart = !start || itemDate >= start;
-            const matchEnd = !end || itemDate <= end;
-            return matchName && matchStart && matchEnd;
-        });
-        renderTable(filteredData);
-    }
-
-    function resetFilter() {
-        document.getElementById('searchName').value = '';
-        document.getElementById('startDate').value = '';
-        document.getElementById('endDate').value = '';
-        filteredData = originalData;
-        renderTable(filteredData);
-    }
-
-    // Analytics Chart setup
-    function initChart() {
-        const ctx = document.getElementById('attendanceChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['ច័ន្ទ', 'អង្គារ', 'ពុធ', 'ព្រហស្បតិ៍', 'សុក្រ'],
-                datasets: [{
-                    label: 'វត្តមាន',
-                    data: [12, 19, 15, 17, 14],
-                    backgroundColor: '#F16522',
-                    borderRadius: 6
-                }]
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
-    }
-
-    // Leave Approval Action
-    function approveLeave(btn, isApproved) {
-        const row = btn.closest('tr');
-        const badgeCell = row.cells[3];
-        if(isApproved) {
-            badgeCell.innerHTML = '<span class="badge badge-in">អនុម័តរួច</span>';
-        } else {
-            badgeCell.innerHTML = '<span class="badge badge-late">បដិសេធ</span>';
-        }
-        row.cells[4].innerHTML = '<span>រួចរាល់</span>';
-    }
-
-    // Save Settings & Telegram Integration Notification Simulation
-    function saveSettings() {
-        const shift = document.getElementById('shiftTime').value;
-        const radius = document.getElementById('gpsRadius').value;
-        const botToken = document.getElementById('tgToken').value;
-        const chatId = document.getElementById('tgChatId').value;
-
-        localStorage.setItem('config_shift', shift);
-        localStorage.setItem('config_radius', radius);
-        
-        if(botToken && chatId) {
-            // Send Test Notification to Telegram
-            const message = encodeURIComponent(`⚙️ **ការកំណត់ត្រូវ​បានកែប្រែ**\n⏰ Shift: ${shift}\n📍 GPS Radius: ${radius}m`);
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`);
-        }
-        alert("រក្សាទុកការកំណត់ និងតភ្ជាប់ Telegram ជោគជ័យ!");
-    }
-
-    function exportExcel() {
-        const ws = XLSX.utils.json_to_sheet(filteredData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Filtered_Attendance");
-        XLSX.writeFile(wb, `Attendance_Filtered.xlsx`);
-    }
-
-    function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("Filtered Attendance Report", 14, 15);
-        const rows = filteredData.map(i => [i.userName, i.actionType, i.distance, i.timestamp]);
-        doc.autoTable({ head: [["Name", "Action", "Distance", "Date"]], body: rows, startY: 25 });
-        doc.save("Attendance_Filtered.pdf");
     }
 </script>
 </body>
