@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 // 🔴 1. ដាក់ Google Sheet Web App URL របស់អ្នកត្រង់នេះ
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbzyVbizqdKWSy03tvw9NKPBS4zRTxkvv9odNv82h8QxdYeXGBVN1vNwwu7yY_qk4DDQjQ/exec";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxDHFlgKX_wMpwM1PE3Mz1oepqLssvK0CsWzUvV1qGhQd2I0-CGUmr7td-tS_G0Vao49g/exec";
 
 // បញ្ជូន File index.html ទៅកាន់អ្នកប្រើប្រាស់ដោយស្វ័យប្រវត្តិ
 app.use(express.static(__dirname));
