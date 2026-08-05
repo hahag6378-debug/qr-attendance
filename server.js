@@ -1,4 +1,5 @@
 const express = require('express');
+const fetch = require('node-fetch');
 const path = require('path');
 const app = express();
 
@@ -11,14 +12,14 @@ const OFFICE_LNG = 104.9282;
 const ALLOWED_METERS = 30; // កំណត់ចម្ងាយ ៣០ ម៉ែត្រ
 
 // 🔴 QR Code Content ផ្លូវការរបស់ហាង
-const VALID_QR_CODE = "MY_SHOP_ATTENDANCE_2026";
+const VALID_QR_CODE = "COMPANY_OFFICE_QR_2026";
 
 // 🔴 Google Apps Script Web App URL របស់អ្នក
 const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxDHFlgKX_wMpwM1PE3Mz1oepqLssvK0CsWzUvV1qGhQd2I0-CGUmr7td-tS_G0Vao49g/exec";
 
 // មុខងារគណនាចម្ងាយ GPS (Haversine Formula)
 function getDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371e3;
+    const R = 6371e3; // គិតជាម៉ែត្រ
     const φ1 = lat1 * Math.PI / 180;
     const φ2 = lat2 * Math.PI / 180;
     const Δφ = (lat2 - lat1) * Math.PI / 180;
