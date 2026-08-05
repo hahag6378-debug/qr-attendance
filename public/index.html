@@ -9,15 +9,44 @@
     <style>
         * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif !important; }
         body { margin: 0; padding: 16px; background-color: #F1F5F9; color: #0F172A; text-align: center; }
-        .card { background: white; border-radius: 16px; padding: 20px; max-width: 480px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .card { background: white; border-radius: 16px; padding: 24px 20px; max-width: 480px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        /* 🟢 បន្ថែម Header & Logo Styling */
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .logo-svg {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+        }
+        .brand-text {
+            text-align: left;
+        }
+        .brand-text h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0F172A;
+            line-height: 1.2;
+        }
+        .brand-text p {
+            margin: 3px 0 0 0;
+            font-size: 12px;
+            color: #64748B;
+        }
+
         .btn-group { display: flex; gap: 10px; margin-bottom: 16px; }
-        .btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; }
+        .btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
         .btn-checkin { background: #E0E7FF; color: #3730A3; border: 2px solid #6366F1; }
         .btn-checkin.active { background: #4F46E5; color: white; }
         .btn-checkout { background: #FEE2E2; color: #991B1B; border: 2px solid #EF4444; }
         .btn-checkout.active { background: #DC2626; color: white; }
         
-        /* កែច្នៃកន្លែងបង្ហាញកាមេរ៉ាឱ្យស្អាត */
         #interactive { width: 100%; max-width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background: #000; position: relative; }
         #reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; }
         
@@ -31,6 +60,18 @@
 <body>
 
 <div class="card">
+    <!-- 🟢 ផ្នែក Heading បង្ហាញ Logo និងឈ្មោះប្រព័ន្ធ -->
+    <div class="brand-header">
+        <svg class="logo-svg" viewBox="0 0 512 512" fill="none">
+            <path fill="#F16522" d="M403.75,289.1c-12.38-12.39-19.18-28.47-19.15-45.27c0.05-31.64,24.14-58.48,55.25-63.39c-10.47-30.2-27.76-57.4-51.84-81.59C345.37,56.02,293.31,34.6,231.84,34.6c-61.29,0-113.26,21.42-155.9,64.24c-42.64,42.83-63.95,95.08-63.95,156.73c0,61.85,21.32,114.29,63.95,157.29c42.64,43.02,94.61,64.52,155.9,64.52c61.47,0,113.53-21.5,156.17-64.52c29.93-30.18,49.35-65.01,58.28-104.48C430.61,307.56,415.26,300.63,403.75,289.1z M262.48,276.24c-8.06,8.54-18.28,12.8-30.64,12.8c-12.19,0-22.31-4.26-30.37-12.8c-8.06-8.52-12.09-19.26-12.09-32.18c0-12.94,4.03-23.66,12.09-32.19c8.06-8.53,18.18-12.79,30.37-12.79c12.37,0,22.58,4.26,30.64,12.79c8.06,8.53,12.08,19.26,12.08,32.19C274.56,256.98,270.54,267.72,262.48,276.24z"/>
+            <path fill="#F16522" d="M500.01,244.2c-0.18,25.42-19.36,46.64-43.9,49.93c-1.98,0.27-3.99,0.41-6.04,0.44c-0.37,0-0.76,0-1.13-0.01c-27.1-0.31-50.48-23.67-50.44-50.71c0.04-25.23,20.24-46.92,45.51-49.96c1.57-0.19,3.16-0.3,4.76-0.34c1.07-0.03,2.14-0.02,3.19,0.03C478.5,194.61,500.19,217.1,500.01,244.2z"/>
+        </svg>
+        <div class="brand-text">
+            <h1>ATTENDANCE SCANNER</h1>
+            <p>ប្រព័ន្ធស្កេនវត្តមានបុគ្គលិក</p>
+        </div>
+    </div>
+
     <div class="btn-group">
         <button id="btnIn" class="btn btn-checkin active" onclick="setAction('Check-In')">👋 ចូល (Check-In)</button>
         <button id="btnOut" class="btn btn-checkout" onclick="setAction('Check-Out')">🚪 ចេញ (Check-Out)</button>
@@ -69,7 +110,7 @@
 
     async function onScanSuccess(decodedText, decodedResult) {
         if (!isScanning) return;
-        isScanning = false; // បញ្ឈប់ការស្កេនជាន់គ្នា
+        isScanning = false;
 
         const userName = document.getElementById('userName').value.trim() || 'Employee';
 
@@ -96,23 +137,20 @@
             showStatus('❌ មានបញ្ហាភ្ជាប់ទៅ Server!', false);
         }
 
-        // អនុញ្ញាតឱ្យស្កេនម្តងទៀតបន្ទាប់ពី ២.៥ វិនាទី
         setTimeout(() => {
             isScanning = true;
         }, 2500);
     }
 
-    // 🟢 អនុគមន៍បើកកាមេរ៉ាស្វ័យប្រវត្តិ
     function startCamera() {
         html5QrCode = new Html5Qrcode("reader");
         const config = { fps: 10, qrbox: { width: 220, height: 220 } };
 
-        // បើកកាមេរ៉ាក្រោយ (Environment Camera) ដោយស្វ័យប្រវត្តិ
         html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
         .catch(err => {
             console.warn("កាមេរ៉ាក្រោយមិនដើរ, កំពុងបើកកាមេរ៉ាដែលទំនេរ...", err);
             html5QrCode.start({ facingMode: "user" }, config, onScanSuccess)
-            .catch(e => showStatus("❌ មិនអាចបើកកាមេរ៉ាបានទេ! សូមបើក Permission ក្នុង Browser", false));
+            .catch(e => showStatus("❌ មិនអាចបើកកាមេរ៉ាបានទេ!", false));
         });
     }
 
