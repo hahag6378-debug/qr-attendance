@@ -11,7 +11,6 @@
         body { margin: 0; padding: 16px; background-color: #F1F5F9; color: #0F172A; text-align: center; }
         .card { background: white; border-radius: 16px; padding: 24px 20px; max-width: 480px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
-        /* 🟢 បន្ថែម Header & Logo Styling */
         .brand-header {
             display: flex;
             align-items: center;
@@ -53,14 +52,17 @@
         .status-msg { margin-top: 15px; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; display: none; }
         .status-success { background: #DCFCE7; color: #166534; display: block; }
         .status-error { background: #FEE2E2; color: #991B1B; display: block; }
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #CBD5E1; margin-bottom: 14px; font-size: 14px; outline: none; }
+        
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #CBD5E1; margin-bottom: 14px; font-size: 14px; outline: none; transition: border-color 0.2s; }
         input:focus { border-color: #4F46E5; }
+        /* 🔴 Style ពេលភ្លេចបញ្ចូលឈ្មោះ */
+        input.input-error { border: 2px solid #EF4444; background-color: #FEF2F2; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <!-- 🟢 ផ្នែក Heading បង្ហាញ Logo និងឈ្មោះប្រព័ន្ធ -->
+    <!-- Header / Logo -->
     <div class="brand-header">
         <svg class="logo-svg" viewBox="0 0 512 512" fill="none">
             <path fill="#F16522" d="M403.75,289.1c-12.38-12.39-19.18-28.47-19.15-45.27c0.05-31.64,24.14-58.48,55.25-63.39c-10.47-30.2-27.76-57.4-51.84-81.59C345.37,56.02,293.31,34.6,231.84,34.6c-61.29,0-113.26,21.42-155.9,64.24c-42.64,42.83-63.95,95.08-63.95,156.73c0,61.85,21.32,114.29,63.95,157.29c42.64,43.02,94.61,64.52,155.9,64.52c61.47,0,113.53-21.5,156.17-64.52c29.93-30.18,49.35-65.01,58.28-104.48C430.61,307.56,415.26,300.63,403.75,289.1z M262.48,276.24c-8.06,8.54-18.28,12.8-30.64,12.8c-12.19,0-22.31-4.26-30.37-12.8c-8.06-8.52-12.09-19.26-12.09-32.18c0-12.94,4.03-23.66,12.09-32.19c8.06-8.53,18.18-12.79,30.37-12.79c12.37,0,22.58,4.26,30.64,12.79c8.06,8.53,12.08,19.26,12.08,32.19C274.56,256.98,270.54,267.72,262.48,276.24z"/>
@@ -77,7 +79,8 @@
         <button id="btnOut" class="btn btn-checkout" onclick="setAction('Check-Out')">🚪 ចេញ (Check-Out)</button>
     </div>
 
-    <input type="text" id="userName" placeholder="បញ្ចូលឈ្មោះ ឬ ID បុគ្គលិក...">
+    <!-- ប្រអប់បញ្ចូលឈ្មោះទាមទារឱ្យបំពេញ -->
+    <input type="text" id="userName" placeholder="បញ្ចូលឈ្មោះ ឬ ID បុគ្គលិក (ទាមទារ) *" oninput="clearInputError()">
 
     <div id="interactive">
         <div id="reader" style="width: 100%; height: 100%;"></div>
@@ -108,11 +111,28 @@
         statusBox.className = 'status-msg ' + (isSuccess ? 'status-success' : 'status-error');
     }
 
+    function clearInputError() {
+        const input = document.getElementById('userName');
+        if (input.value.trim() !== '') {
+            input.classList.remove('input-error');
+        }
+    }
+
     async function onScanSuccess(decodedText, decodedResult) {
         if (!isScanning) return;
-        isScanning = false;
 
-        const userName = document.getElementById('userName').value.trim() || 'Employee';
+        const userInput = document.getElementById('userName');
+        const userName = userInput.value.trim();
+
+        // 🔴 ពិនិត្យមើលឈ្មោះ៖ បើអត់ទាន់បញ្ចូលឈ្មោះទេ នឹងបង្ហាញ Error ហើយមិនផ្ញើទៅ Server ឡើយ
+        if (!userName) {
+            userInput.classList.add('input-error');
+            userInput.focus();
+            showStatus('⚠️ សូមបញ្ចូលឈ្មោះ ឬ ID បុគ្គលិកជាមុនសិន មុននឹងស្កេន!', false);
+            return;
+        }
+
+        isScanning = false;
 
         try {
             const response = await fetch('/api/scan-attendance', {
@@ -137,6 +157,7 @@
             showStatus('❌ មានបញ្ហាភ្ជាប់ទៅ Server!', false);
         }
 
+        // អនុញ្ញាតឱ្យស្កេនបន្តទៀតក្រោយ ២.៥ វិនាទី
         setTimeout(() => {
             isScanning = true;
         }, 2500);
