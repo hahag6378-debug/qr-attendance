@@ -1,12 +1,10 @@
 const express = require('express');
-const cors = require('cors');
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// ផ្ទុកទិន្នន័យវត្តមានបណ្តោះអាសន្ន (ឬប្រើ Database របស់បង)
+// ផ្ទុកទិន្នន័យវត្តមានបណ្តោះអាសន្ន
 let attendanceRecords = [];
 
 // 🟢 អនុគមន៍ផ្ញើសារស្វ័យប្រវត្តិទៅកាន់ Telegram
@@ -51,7 +49,7 @@ app.post('/api/scan-attendance', (req, res) => {
 
     attendanceRecords.unshift(newRecord);
 
-    // ហៅអនុគមន៍ផ្ញើសារទៅ Telegram ភ្លាមៗ
+    // ផ្ញើសារប្រាប់ដំណឹងទៅ Telegram ភ្លាមៗ
     sendTelegramNotification(newRecord.userName, newRecord.actionType, newRecord.distance, botToken, chatId);
 
     res.json({ success: true, message: 'ស្កេនវត្តមានជោគជ័យ!', record: newRecord });
