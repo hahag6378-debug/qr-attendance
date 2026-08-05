@@ -1,6 +1,159 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ប្រព័ន្ធស្កេនវត្តមាន</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Kantumruy Pro', sans-serif !important;
+        }
+
+        body { 
+            margin: 0; 
+            padding: 16px; 
+            background-color: #F2F2F7;
+            color: #1C1C1E;
+            display: flex;
+            justify-content: center;
+        }
+
+        .ios-container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ios-header { text-align: center; }
+        h2 { font-size: 22px; margin: 0 0 4px 0; }
+        .ios-subtitle { font-size: 14px; color: #8E8E93; }
+
+        .ios-group {
+            background-color: #FFFFFF;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        label.field-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #8E8E93;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] { 
+            width: 100%; 
+            padding: 14px; 
+            font-size: 16px; 
+            background-color: #F2F2F7;
+            border: 1px solid transparent;
+            border-radius: 12px; 
+            outline: none;
+        }
+
+        .ios-action-group { display: flex; gap: 12px; }
+        .ios-action-option { flex: 1; position: relative; }
+        .ios-action-option input[type="radio"] { position: absolute; opacity: 0; }
+
+        .ios-action-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #FFFFFF;
+            padding: 16px 8px;
+            border-radius: 16px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .ios-icon { font-size: 26px; margin-bottom: 6px; }
+
+        .ios-action-option input[type="radio"]:checked + label {
+            border-color: #007AFF;
+            background-color: rgba(0, 122, 255, 0.06);
+            color: #007AFF;
+        }
+
+        .scanner-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background-color: #000;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        #reader { width: 100% !important; height: 100% !important; border: none !important; }
+        #reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+
+        #status { 
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px; 
+            border-radius: 12px; 
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .success { background-color: rgba(52, 199, 89, 0.12); color: #34C759; }
+        .error { background-color: rgba(255, 59, 48, 0.12); color: #FF3B30; }
+        .loading { background-color: rgba(0, 122, 255, 0.12); color: #007AFF; }
+    </style>
+</head>
+<body>
+
+<div class="ios-container">
+    <div class="ios-header">
+        <h2>ចុះវត្តមានធ្វើការ</h2>
+        <div class="ios-subtitle">សូមស្កេន QR Code ដើមី្បកត់ត្រា</div>
+    </div>
+    
+    <div class="ios-group">
+        <label class="field-label" for="userName">ឈ្មោះ ឬ ID បុគ្គលិក</label>
+        <input type="text" id="userName" placeholder="បញ្ចូលឈ្មោះ ឬ ID...">
+    </div>
+
+    <div class="ios-action-group">
+        <div class="ios-action-option">
+            <input type="radio" name="actionType" value="Check-In" id="checkin" checked>
+            <label for="checkin"><span class="ios-icon">👍</span>ចូល (Check-In)</label>
+        </div>
+        <div class="ios-action-option">
+            <input type="radio" name="actionType" value="Check-Out" id="checkout">
+            <label for="checkout"><span class="ios-icon">🏠</span>ចេញ (Check-Out)</label>
+        </div>
+    </div>
+
+    <div class="ios-group" style="padding: 12px;">
+        <label class="field-label">កាមេរ៉ាស្កេន</label>
+        <div class="scanner-wrapper">
+            <div id="reader"></div>
+        </div>
+    </div>
+
+    <div id="status">
+        <span id="status-icon">🔄</span>
+        <span id="status-text"></span>
+    </div>
+</div>
+
 <script>
     const html5QrCode = new Html5Qrcode("reader");
-    let isScanning = false; // ការពារស្កេនជាន់គ្នា
+    let isProcessing = false;
 
     function showStatus(msg, type) {
         const statusDiv = document.getElementById('status');
@@ -11,66 +164,55 @@
         statusText.innerText = msg;
         statusDiv.className = type;
 
-        if (type === 'success') { statusIcon.innerText = '✅'; }
-        else if (type === 'error') { statusIcon.innerText = '❌'; }
-        else if (type === 'loading') { statusIcon.innerText = '🔄'; }
+        if (type === 'success') statusIcon.innerText = '✅';
+        else if (type === 'error') statusIcon.innerText = '❌';
+        else statusIcon.innerText = '🔄';
     }
 
-    function sendCheckin(userName, lat, lng, actionType, qrData) {
+    function sendData(userName, lat, lng, actionType, qrData) {
         showStatus("កំពុងផ្ទៀងផ្ទាត់...", 'loading');
         
         fetch('/api/checkin', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userName: userName,
-                userLat: lat,
-                userLng: lng,
-                actionType: actionType,
-                qrCodeData: qrData
-            })
+            body: JSON.stringify({ userName, userLat: lat, userLng: lng, actionType, qrCodeData: qrData })
         })
         .then(res => res.json())
         .then(data => {
             showStatus(data.message, data.success ? 'success' : 'error');
-            setTimeout(() => { isScanning = false; }, 3000); // អនុញ្ញាតឱ្យស្កេនម្តងទៀតក្រោយ 3 វិនាទី
+            setTimeout(() => { isProcessing = false; }, 3000);
         })
-        .catch(err => {
-            showStatus("មានបញ្ហាតភ្ជាប់ទៅកាន់ Server!", 'error');
-            setTimeout(() => { isScanning = false; }, 3000);
+        .catch(() => {
+            showStatus("មានបញ្ហាតភ្ជាប់ទៅ Server!", 'error');
+            setTimeout(() => { isProcessing = false; }, 3000);
         });
     }
 
-    const config = { fps: 10, qrbox: { width: 220, height: 220 } };
-
     html5QrCode.start(
         { facingMode: "environment" },
-        config,
+        { fps: 10, qrbox: { width: 220, height: 220 } },
         (decodedText) => {
-            if (isScanning) return; // បើកំពុង Process មិនឱ្យស្កេនស្ទួនទេ
-            
+            if (isProcessing) return;
+
             const userName = document.getElementById('userName').value;
             const actionType = document.querySelector('input[name="actionType"]:checked').value;
 
-            if (!userName || userName.trim() === "") {
+            if (!userName || !userName.trim()) {
                 showStatus("សូមវាយឈ្មោះរបស់អ្នកមុននឹងស្កេន!", 'error');
                 return;
             }
 
-            isScanning = true;
-
-            // យក Location ដោយមាន Timeout ការពារស្ទះ
+            isProcessing = true;
+            
             navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    sendCheckin(userName, pos.coords.latitude, pos.coords.longitude, actionType, decodedText);
-                },
-                (err) => {
-                    // ប្រសិនបើ GPS បើកមិនចេញ ឱ្យផ្ញើ Location 0,0 ទៅតេស្តសិន
-                    sendCheckin(userName, 11.5564, 104.9282, actionType, decodedText);
-                },
-                { timeout: 5000, enableHighAccuracy: true }
+                (pos) => sendData(userName, pos.coords.latitude, pos.coords.longitude, actionType, decodedText),
+                () => sendData(userName, 11.5564, 104.9282, actionType, decodedText),
+                { timeout: 4000 }
             );
         },
-        (errorMessage) => {}
+        () => {}
     );
 </script>
+
+</body>
+</html>
