@@ -4,12 +4,24 @@ const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
-// ផ្ទុកទិន្នន័យវត្តមានបណ្តោះអាសន្ន
+// ផ្ទុកទិន្នន័យ
 let attendanceRecords = [];
+let systemConfig = {
+    botToken: '',
+    chatId: '',
+    shiftStart: '06:00',
+    gpsRadius: 50
+};
 
-// 🟢 អនុគមន៍ផ្ញើសារស្វ័យប្រវត្តិទៅកាន់ Telegram
-async function sendTelegramNotification(userName, actionType, distance, botToken, chatId) {
-    if (!botToken || !chatId) return;
+// 🟢 អនុគមន៍ផ្ញើសារប្រាប់ដំណឹងទៅ Telegram
+async function sendTelegramNotification(userName, actionType, distance) {
+    const { botToken, chatId } = systemConfig;
+    
+    // បើគ្មាន Token ឬ Chat ID ទេ វាមិនផ្ញើឡើយ
+    if (!botToken || !chatId) {
+        console.log("⚠️ មិនទាន់កំណត់ Telegram Bot Token ឬ Chat ID ឡើយ!");
+        return;
+    }
 
     const icon = actionType === 'Check-In' ? '🟢' : '🔴';
     const timeString = new Date().toLocaleString('km-KH', { timeZone: 'Asia/Phnom_Penh' });
@@ -30,14 +42,27 @@ async function sendTelegramNotification(userName, actionType, distance, botToken
                 parse_mode: 'Markdown'
             })
         });
+        console.log("✅ ផ្ញើសារទៅ Telegram ជោគជ័យ!");
     } catch (error) {
-        console.error("Telegram Notification Error:", error);
+        console.error("❌ Telegram Notification Error:", error);
     }
 }
 
-// 🟢 API សម្រាប់បុគ្គលិកស្កេនវត្តមាន
+// 🟢 API សម្រាប់ រក្សាទុកការកំណត់ (Settings) ពី Admin
+app.post('/api/save-settings', (req, res) => {
+    const { shiftStart, gpsRadius, botToken, chatId } = req.body;
+    systemConfig = { shiftStart, gpsRadius, botToken, chatId };
+    res.json({ success: true, message: 'រក្សាទុកការកំណត់ជោគជ័យ!' });
+});
+
+// 🟢 API សម្រាប់ ទាញយកការកំណត់ (Settings) មកបង្ហាញលើ Admin
+app.get('/api/get-settings', (req, res) => {
+    res.json(systemConfig);
+});
+
+// 🟢 API សម្រាប់ បុគ្គលិកស្កេនវត្តមាន
 app.post('/api/scan-attendance', (req, res) => {
-    const { userName, actionType, distance, botToken, chatId } = req.body;
+    const { userName, actionType, distance } = req.body;
 
     const newRecord = {
         id: attendanceRecords.length + 1,
@@ -49,8 +74,8 @@ app.post('/api/scan-attendance', (req, res) => {
 
     attendanceRecords.unshift(newRecord);
 
-    // ផ្ញើសារប្រាប់ដំណឹងទៅ Telegram ភ្លាមៗ
-    sendTelegramNotification(newRecord.userName, newRecord.actionType, newRecord.distance, botToken, chatId);
+    // ហៅអនុគមន៍ផ្ញើសារ Telegram
+    sendTelegramNotification(newRecord.userName, newRecord.actionType, newRecord.distance);
 
     res.json({ success: true, message: 'ស្កេនវត្តមានជោគជ័យ!', record: newRecord });
 });
