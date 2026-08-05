@@ -11,7 +11,7 @@ const OFFICE_LNG = 104.9282;
 const ALLOWED_METERS = 30; // កំណត់ចម្ងាយ ៣០ ម៉ែត្រ
 
 // 🔴 QR Code Content ផ្លូវការ
-const VALID_QR_CODE = "COMPANY_OFFICE_QR_2026";
+const VALID_QR_CODE = "https://q.me-qr.com/c4emo1w3";
 
 // 🔴 Google Apps Script Web App URL
 const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
