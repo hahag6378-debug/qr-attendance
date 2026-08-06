@@ -3,61 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Attendance System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>ចូលប្រព័ន្ធ - QR Attendance</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Khmer Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif; }
-        body { background: #F1F5F9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .login-card { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 380px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
-        h2 { margin-bottom: 20px; color: #0F172A; }
-        input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #CBD5E1; border-radius: 8px; outline: none; }
-        button { width: 100%; padding: 12px; background: #4F46E5; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-        .error { color: #DC2626; font-size: 13px; margin-top: 10px; display: none; }
+        * { font-family: 'Kantumruy Pro', sans-serif; }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.15; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.08); }
+        }
+        .animate-pulse-bg {
+            animation: pulse-slow 7s ease-in-out infinite;
+        }
     </style>
 </head>
-<body>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex items-center justify-center p-4 relative overflow-hidden selection:bg-orange-500 selection:text-black">
 
-<div class="login-card">
-    <h2>🔐 ចូលប្រើប្រាស់ប្រព័ន្ធ</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="handleLogin()">Login</button>
-    <div id="errorMsg" class="error"></div>
-</div>
+    <!-- Background Ambient Glow Effects -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/20 rounded-full blur-[120px] pointer-events-none animate-pulse-bg"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
 
-<script>
-    async function handleLogin() {
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value.trim();
-        const errorMsg = document.getElementById('errorMsg');
+    <!-- Login Card Container -->
+    <div class="w-full max-w-md bg-zinc-900/90 rounded-3xl shadow-2xl border border-zinc-800/80 p-8 backdrop-blur-xl hover:border-orange-500/40 hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] transition-all duration-500 relative z-10 group">
+        
+        <!-- Logo & Title Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center bg-gradient-to-tr from-orange-600 to-amber-500 w-16 h-16 rounded-2xl text-zinc-950 font-bold shadow-lg shadow-orange-500/20 group-hover:scale-110 group-hover:shadow-orange-500/40 transition-all duration-300 mb-4">
+                <i class="fa-solid fa-qrcode text-3xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-white tracking-wide">ចូលប្រព័ន្ធវត្តមាន</h1>
+            <p class="text-xs text-zinc-400 mt-1">QR ATTENDANCE SYSTEM</p>
+        </div>
 
-        try {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await res.json();
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-5">
+            <!-- Username -->
+            <div class="group/input">
+                <label class="block text-sm font-semibold text-zinc-300 mb-2 group-focus-within/input:text-orange-400 transition-colors">ឈ្មោះគណនី (Username)</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within/input:text-orange-400 transition-colors">
+                        <i class="fa-solid fa-user"></i>
+                    </span>
+                    <input type="text" id="username" placeholder="បញ្ចូល Username" required 
+                        class="w-full pl-11 pr-4 py-3.5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-sm">
+                </div>
+            </div>
 
-            if (res.ok && data.success) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
+            <!-- Password -->
+            <div class="group/input">
+                <label class="block text-sm font-semibold text-zinc-300 mb-2 group-focus-within/input:text-orange-400 transition-colors">ពាក្យសម្ងាត់ (Password)</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within/input:text-orange-400 transition-colors">
+                        <i class="fa-solid fa-key"></i>
+                    </span>
+                    <input type="password" id="password" placeholder="••••••••" required 
+                        class="w-full pl-11 pr-4 py-3.5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-sm">
+                </div>
+            </div>
 
-                if (data.user.role === 'admin') {
-                    window.location.href = '/admin.html';
+            <!-- Error Message Alert -->
+            <div id="message" class="hidden text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center font-medium"></div>
+
+            <!-- Submit Button -->
+            <button type="submit" 
+                class="w-full mt-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-zinc-950 font-bold py-4 px-4 rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35 hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer">
+                <i class="fa-solid fa-right-to-bracket text-lg"></i>
+                <span class="tracking-wide">LOGIN ចូលប្រព័ន្ធ</span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+
+            messageDiv.classList.add('hidden');
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    if (data.user.role === 'admin') {
+                        window.location.href = '/admin.html';
+                    } else {
+                        window.location.href = '/index.html';
+                    }
                 } else {
-                    window.location.href = '/index.html';
+                    messageDiv.innerText = data.message || 'Login បរាជ័យ!';
+                    messageDiv.classList.remove('hidden');
                 }
-            } else {
-                errorMsg.innerText = data.message;
-                errorMsg.style.display = 'block';
+            } catch (err) {
+                messageDiv.innerText = 'មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ!';
+                messageDiv.classList.remove('hidden');
             }
-        } catch (err) {
-            errorMsg.innerText = 'មានបញ្ហាភ្ជាប់ទៅ Server!';
-            errorMsg.style.display = 'block';
-        }
-    }
-</script>
-
+        });
+    </script>
 </body>
 </html>
