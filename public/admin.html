@@ -3,183 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Attendance System</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%23F16522' d='M403.75,289.1c-12.38-12.39-19.18-28.47-19.15-45.27c0.05-31.64,24.14-58.48,55.25-63.39c-10.47-30.2-27.76-57.4-51.84-81.59C345.37,56.02,293.31,34.6,231.84,34.6c-61.29,0-113.26,21.42-155.9,64.24c-42.64,42.83-63.95,95.08-63.95,156.73c0,61.85,21.32,114.29,63.95,157.29c42.64,43.02,94.61,64.52,155.9,64.52c61.47,0,113.53-21.5,156.17-64.52c29.93-30.18,49.35-65.01,58.28-104.48C430.61,307.56,415.26,300.63,403.75,289.1z M262.48,276.24c-8.06,8.54-18.28,12.8-30.64,12.8c-12.19,0-22.31-4.26-30.37-12.8c-8.06-8.52-12.09-19.26-12.09-32.18c0-12.94,4.03-23.66,12.09-32.19c8.06-8.53,18.18-12.79,30.37-12.79c12.37,0,22.58,4.26,30.64,12.79c8.06,8.53,12.08,19.26,12.08,32.19C274.56,256.98,270.54,267.72,262.48,276.24z'/><path fill='%23F16522' d='M500.01,244.2c-0.18,25.42-19.36,46.64-43.9,49.93c-1.98,0.27-3.99,0.41-6.04,0.44c-0.37,0-0.76,0-1.13-0.01c-27.1-0.31-50.48-23.67-50.44-50.71c0.04-25.23,20.24-46.92,45.51-49.96c1.57-0.19,3.16-0.3,4.76-0.34c1.07-0.03,2.14-0.02,3.19,0.03C478.5,194.61,500.19,217.1,500.01,244.2z'/></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>Admin - Add Employee</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif !important; }
-        body { margin: 0; padding: 0; background-color: #F8FAFC; color: #0F172A; }
-        
-        header { 
-            background: rgba(255, 255, 255, 0.9);
-            border-bottom: 1px solid #E2E8F0;
-            padding: 16px 32px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .brand { display: flex; align-items: center; gap: 12px; }
-        .logo-svg { width: 44px; height: 44px; }
-        .brand-text h1 { margin: 0; font-size: 18px; font-weight: 700; }
-        .brand-text p { margin: 2px 0 0 0; font-size: 12px; color: #64748B; }
-
-        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-        .card { background: white; border-radius: 16px; border: 1px solid #E2E8F0; padding: 24px; margin-bottom: 24px; }
-
-        .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
-        @media(max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
-
-        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; }
-        .btn-orange { background: #F16522; color: white; }
-        .btn-logout { background: #F1F5F9; color: #64748B; border: 1px solid #CBD5E1; }
-
-        input { padding: 10px 14px; border-radius: 8px; border: 1px solid #CBD5E1; outline: none; font-size: 14px; }
-        
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #F8FAFC; padding: 12px; text-align: left; border-bottom: 2px solid #E2E8F0; }
-        td { padding: 12px; border-bottom: 1px solid #F1F5F9; }
-        
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .badge-in { background: #DCFCE7; color: #166534; }
-        .badge-late { background: #FEE2E2; color: #991B1B; }
+        * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif; }
+        body { background: #F1F5F9; padding: 20px; }
+        .container { background: white; max-width: 500px; margin: 0 auto; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h2 { margin-top: 0; }
+        input { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #CBD5E1; border-radius: 8px; }
+        button { width: 100%; padding: 12px; background: #16A34A; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-logout { background: #DC2626; margin-top: 10px; }
+        .msg { margin-top: 10px; font-weight: 600; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="brand">
-        <svg class="logo-svg" viewBox="0 0 512 512" fill="none">
-            <path fill="#F16522" d="M403.75,289.1c-12.38-12.39-19.18-28.47-19.15-45.27c0.05-31.64,24.14-58.48,55.25-63.39c-10.47-30.2-27.76-57.4-51.84-81.59C345.37,56.02,293.31,34.6,231.84,34.6c-61.29,0-113.26,21.42-155.9,64.24c-42.64,42.83-63.95,95.08-63.95,156.73c0,61.85,21.32,114.29,63.95,157.29c42.64,43.02,94.61,64.52,155.9,64.52c61.47,0,113.53-21.5,156.17-64.52c29.93-30.18,49.35-65.01,58.28-104.48C430.61,307.56,415.26,300.63,403.75,289.1z M262.48,276.24c-8.06,8.54-18.28,12.8-30.64,12.8c-12.19,0-22.31-4.26-30.37-12.8c-8.06-8.52-12.09-19.26-12.09-32.18c0-12.94,4.03-23.66,12.09-32.19c8.06-8.53,18.18-12.79,30.37-12.79c12.37,0,22.58,4.26,30.64,12.79c8.06,8.53,12.08,19.26,12.08,32.19C274.56,256.98,270.54,267.72,262.48,276.24z"/>
-            <path fill="#F16522" d="M500.01,244.2c-0.18,25.42-19.36,46.64-43.9,49.93c-1.98,0.27-3.99,0.41-6.04,0.44c-0.37,0-0.76,0-1.13-0.01c-27.1-0.31-50.48-23.67-50.44-50.71c0.04-25.23,20.24-46.92,45.51-49.96c1.57-0.19,3.16-0.3,4.76-0.34c1.07-0.03,2.14-0.02,3.19,0.03C478.5,194.61,500.19,217.1,500.01,244.2z"/>
-        </svg>
-        <div class="brand-text">
-            <h1>ATTENDANCE ADMIN</h1>
-            <p>ប្រព័ន្ធគ្រប់គ្រងវត្តមានបុគ្គលិក</p>
-        </div>
-    </div>
-    <div id="header-logout" style="display: none;">
-        <button onclick="logout()" class="btn btn-logout"><i data-lucide="log-out"></i> ចាកចេញ</button>
-    </div>
-</header>
-
 <div class="container">
-    <div id="login-section" class="card" style="max-width: 380px; margin: 80px auto; text-align: center;">
-        <h2>Admin</h2>
-        <input type="password" id="adminPass" placeholder="បញ្ចូល Password..." style="width:100%; margin:15px 0;">
-        <button onclick="loginAdmin()" class="btn btn-orange" style="width:100%; justify-content:center;">Login</button>
-    </div>
+    <h2>👤 បន្ថែមបុគ្គលិកថ្មី (Add Employee)</h2>
+    <label>ឈ្មោះពេញ (Full Name):</label>
+    <input type="text" id="fullName" placeholder="ឧទាហរណ៍៖ សុខ ជា">
 
-    <div id="dashboard-section" style="display: none;">
-        <div class="grid-2">
-            <div>
-                <div class="card">
-                    <h3>📋 របាយការណ៍វត្តមាន</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID/ឈ្មោះ</th>
-                                    <th>សកម្មភាព</th>
-                                    <th>ចម្ងាយ</th>
-                                    <th>កាលបរិច្ឆេទ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="attendanceTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+    <label>Username (សម្រាប់ Login):</label>
+    <input type="text" id="username" placeholder="ឧទាហរណ៍៖ sokchea">
 
-            <div>
-                <div class="card">
-                    <h3 style="margin-top:0;">⚙️ កំណត់រចនាសម្ព័ន្ធប្រព័ន្ធ</h3>
-                    
-                    <label style="font-size:12px; font-weight:600;">⏰ ម៉ោងចូលធ្វើការ (Shift Start):</label>
-                    <input type="time" id="shiftTime" value="08:00" style="width:100%; margin-bottom:10px;">
+    <label>Password:</label>
+    <input type="password" id="password" placeholder="បញ្ចូលពាក្យសម្ងាត់">
 
-                    <label style="font-size:12px; font-weight:600;">📍 កាំចម្ងាយ GPS Radius (ម៉ែត្រ):</label>
-                    <input type="number" id="gpsRadius" value="50" style="width:100%; margin-bottom:10px;">
+    <button onclick="addEmployee()">+ បន្ថែមបុគ្គលិក</button>
+    <button class="btn-logout" onclick="logout()">ចាកចេញ (Logout)</button>
 
-                    <label style="font-size:12px; font-weight:600;">🤖 Telegram Bot Token:</label>
-                    <input type="password" id="tgToken" placeholder="Bot Token..." style="width:100%; margin-bottom:10px;">
-
-                    <label style="font-size:12px; font-weight:600;">📢 Telegram Chat ID:</label>
-                    <input type="text" id="tgChatId" placeholder="-100xxx..." style="width:100%; margin-bottom:15px;">
-
-                    <button onclick="saveSettings()" class="btn btn-orange" style="width:100%; justify-content:center;">
-                        <i data-lucide="save"></i> រក្សាទុកការកំណត់
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="msg" class="msg"></div>
 </div>
 
 <script>
-    lucide.createIcons();
-    const ADMIN_PASSWORD = "admin123456";
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
 
-    function loginAdmin() {
-        if (document.getElementById('adminPass').value === ADMIN_PASSWORD) {
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('dashboard-section').style.display = 'block';
-            document.getElementById('header-logout').style.display = 'block';
-            loadData();
-            loadSettings();
-        } else alert("Password មិនត្រឹមត្រូវ!");
-    }
+    async function addEmployee() {
+        const fullName = document.getElementById('fullName').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const msg = document.getElementById('msg');
 
-    function logout() { location.reload(); }
-
-    // 🟢 ផ្ញើការកំណត់ទៅរក្សាទុកនៅលើ Server
-    function saveSettings() {
-        const configData = {
-            shiftStart: document.getElementById('shiftTime').value,
-            gpsRadius: document.getElementById('gpsRadius').value,
-            botToken: document.getElementById('tgToken').value,
-            chatId: document.getElementById('tgChatId').value
-        };
-
-        fetch('/api/save-settings', {
+        const res = await fetch('/api/admin/add-employee', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(configData)
-        })
-        .then(res => res.json())
-        .then(data => alert("រក្សាទុកការកំណត់ និងភ្ជាប់ Telegram ទៅ Server ជោគជ័យ!"))
-        .catch(err => alert("មានបញ្ហាក្នុងការរក្សាទុក!"));
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ fullName, username, password })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+            msg.style.color = 'green';
+            msg.innerText = '✅ ' + data.message;
+            document.getElementById('fullName').value = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        } else {
+            msg.style.color = 'red';
+            msg.innerText = '❌ ' + data.message;
+        }
     }
 
-    // 🟢 ទាញការកំណត់ពី Server មកបង្ហាញ
-    function loadSettings() {
-        fetch('/api/get-settings')
-            .then(res => res.json())
-            .then(data => {
-                if(data.shiftStart) document.getElementById('shiftTime').value = data.shiftStart;
-                if(data.gpsRadius) document.getElementById('gpsRadius').value = data.gpsRadius;
-                if(data.botToken) document.getElementById('tgToken').value = data.botToken;
-                if(data.chatId) document.getElementById('tgChatId').value = data.chatId;
-            });
-    }
-
-    function loadData() {
-        fetch('/api/export-data')
-            .then(res => res.json())
-            .then(data => {
-                const tbody = document.getElementById('attendanceTable');
-                tbody.innerHTML = '';
-                data.forEach(item => {
-                    const isCheckIn = item.actionType === 'Check-In';
-                    tbody.innerHTML += `<tr>
-                        <td><b>${item.userName}</b></td>
-                        <td><span class="badge ${isCheckIn ? 'badge-in' : 'badge-late'}">${item.actionType}</span></td>
-                        <td>${item.distance}m</td>
-                        <td style="font-size:12px; color:#64748B;">${item.timestamp}</td>
-                    </tr>`;
-                });
-            });
+    function logout() {
+        localStorage.clear();
+        window.location.href = '/login.html';
     }
 </script>
+
 </body>
 </html>
