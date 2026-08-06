@@ -172,7 +172,7 @@
         <div id="employeesSection" class="hidden">
             <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 shadow-2xl overflow-hidden">
                 <div class="p-5 border-b border-zinc-800 flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-white uppercase tracking-wider"><i class="fa-solid fa-users text-orange-400 mr-2"></i> รายชื่อបុគ្គលិកសរុបក្នុងប្រព័ន្ធ</h3>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider"><i class="fa-solid fa-users text-orange-400 mr-2"></i> បញ្ជីឈ្មោះបុគ្គលិកសរុបក្នុងប្រព័ន្ធ</h3>
                     <button onclick="openEmployeeModal()" class="text-xs bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-zinc-950 font-bold px-3 py-1.5 rounded-lg border border-orange-500/20 transition-all cursor-pointer">
                         <i class="fa-solid fa-plus mr-1"></i> បន្ថែមថ្មី
                     </button>
@@ -523,7 +523,7 @@
         async function handleCreateEmployee(e) {
             e.preventDefault();
             const fullName = document.getElementById('newFullName').value.trim();
-            const username = document.getElementById('newUsername.').value?.trim() || document.getElementById('newUsername').value.trim();
+            const username = document.getElementById('newUsername').value.trim();
             const password = document.getElementById('newPassword').value.trim();
 
             try {
