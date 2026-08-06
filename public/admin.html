@@ -194,9 +194,9 @@
                         <thead>
                             <tr class="bg-zinc-950/80 border-b border-zinc-800 text-xs text-zinc-400 font-bold uppercase tracking-wider">
                                 <th class="py-4 px-6">ល.រ</th>
-                                <th class="py-4 px-6">ឈ្មោះពេញ (Full Name)</th>
-                                <th class="py-4 px-6">ឈ្មោះគណនី (Username)</th>
-                                <th class="py-4 px-6">តួនាទី (Role)</th>
+                                <th class="py-4 px-6">ឈ្មោះពេញ (FULL NAME)</th>
+                                <th class="py-4 px-6">ឈ្មោះគណនី (USERNAME)</th>
+                                <th class="py-4 px-6">តួនាទី (ROLE)</th>
                                 <th class="py-4 px-6 text-center">សកម្មភាព</th>
                             </tr>
                         </thead>
@@ -225,15 +225,22 @@
             <form onsubmit="handleCreateEmployee(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-zinc-300 mb-1.5">ឈ្មោះពេញ (Full Name)</label>
-                    <input type="text" id="newFullName" required placeholder="ឧ. សុខ មករា" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-orange-500">
+                    <input type="text" id="newFullName" required placeholder="ឧ. វន សុវណ្ណបញ្ញា" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-orange-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-zinc-300 mb-1.5">ឈ្មោះគណនី (Username)</label>
-                    <input type="text" id="newUsername" required placeholder="ឧ. sokmakara" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-orange-500">
+                    <input type="text" id="newUsername" required placeholder="ឧ. von.sovannpanha" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-orange-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-zinc-300 mb-1.5">ពាក្យសម្ងាត់ (Password)</label>
                     <input type="text" id="newPassword" required placeholder="បញ្ចូលពាក្យសម្ងាត់..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-300 mb-1.5">តួនាទី (Role)</label>
+                    <select id="newRole" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-orange-500">
+                        <option value="employee">Employee</option>
+                        <option value="admin">Admin</option>
+                    </select>
                 </div>
                 <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 font-bold py-3 rounded-xl shadow-lg shadow-orange-500/20 text-sm transition-all cursor-pointer">
                     រក្សាទុកគណនី
@@ -259,6 +266,13 @@
                 <div>
                     <label class="block text-xs font-semibold text-zinc-300 mb-1.5">ឈ្មោះគណនី (Username)</label>
                     <input type="text" id="editUsername" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-300 mb-1.5">តួនាទី (Role)</label>
+                    <select id="editRole" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-orange-500">
+                        <option value="employee">Employee</option>
+                        <option value="admin">Admin</option>
+                    </select>
                 </div>
                 <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 font-bold py-3 rounded-xl shadow-lg shadow-orange-500/20 text-sm transition-all cursor-pointer">
                     រក្សាទុកការកែប្រែ
@@ -293,22 +307,12 @@
         const token = localStorage.getItem('token');
         const userStr = localStorage.getItem('user');
 
-        // ដើម្បីងាយស្រួលតេស្ត បើមិនទាន់ Login អាចលុបបន្ទាត់នេះចេញ ឬទុកអញ្ចឹងសិន
-        if (!token || !userStr) {
-            // window.location.href = '/login.html';
-        }
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = '/login.html';
-        }
-
         let rawLogs = [];
-        // បន្ថែមទិន្នន័យគំរូ (Sample Data) ដើម្បីការពារកុំឱ្យតារាងទទេរស្អាត ពេល API មិនទាន់ដំណើរការ
+        // កំណត់ឈ្មោះ វន សុវណ្ណបញ្ញា ជា Admin ក្នុងបញ្ជីគំរូ
         let employeesList = [
-            { _id: "1", fullName: "សុខ មករា", username: "sokmakara", role: "employee" },
-            { _id: "2", fullName: "ចាន់ វណ្ណា", username: "chanvanna", role: "employee" },
-            { _id: "3", fullName: "ជូ រតនា", username: "churatana", role: "admin" }
+            { _id: "1", fullName: "វន សុវណ្ណបញ្ញា", username: "sovannpanha", role: "admin" },
+            { _id: "2", fullName: "សុខ មករា", username: "sokmakara", role: "employee" },
+            { _id: "3", fullName: "ចាន់ វណ្ណា", username: "chanvanna", role: "employee" }
         ];
         let currentFilteredData = [];
         const OFFICIAL_START_TIME = "08:00:00"; 
@@ -363,7 +367,6 @@
             }
         }
 
-        // 👥 ទាញយកបញ្ជីបុគ្គលិកពី Server ជាមួយប្រព័ន្ធការពារកំហុស
         async function fetchEmployeesList() {
             try {
                 const res = await fetch('/api/admin/employees', {
@@ -371,7 +374,6 @@
                 });
                 const data = await res.json();
                 if (res.ok && data.success && data.employees) {
-                    // ប្រសិនបើ API ឆ្លើយតបមកមានទិន្នន័យ ទើបដូរយកតាម API
                     if(data.employees.length > 0) {
                         employeesList = data.employees;
                     }
@@ -401,6 +403,7 @@
                 const empId = emp._id || emp.id || index;
                 const fullName = emp.fullName || emp.name || 'គ្មានឈ្មោះ';
                 const username = emp.username || '---';
+                const role = emp.role || 'employee';
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-zinc-800/40 transition-all border-b border-zinc-800/40";
@@ -410,17 +413,14 @@
                     <td class="py-4 px-6 text-zinc-300 font-mono">${username}</td>
                     <td class="py-4 px-6">${roleBadge}</td>
                     <td class="py-4 px-6 text-center space-x-2">
-                        ${emp.role !== 'admin' ? `
-                            <button onclick="openEditEmployeeModal('${empId}', '${fullName}', '${username}')" class="bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-zinc-950 px-3 py-1.5 rounded-lg border border-amber-500/20 text-xs font-semibold transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square mr-1"></i> កែប្រែ</button>
-                            <button onclick="deleteEmployee('${empId}')" class="bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white px-3 py-1.5 rounded-lg border border-rose-500/20 text-xs font-semibold transition-all cursor-pointer"><i class="fa-solid fa-trash-can mr-1"></i> លុប</button>
-                        ` : '<span class="text-xs text-zinc-600">មិនមានសិទ្ធិកែប្រែ</span>'}
+                        <button onclick="openEditEmployeeModal('${empId}', '${fullName}', '${username}', '${role}')" class="bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-zinc-950 px-3 py-1.5 rounded-lg border border-amber-500/20 text-xs font-semibold transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square mr-1"></i> កែប្រែ</button>
+                        <button onclick="deleteEmployee('${empId}')" class="bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white px-3 py-1.5 rounded-lg border border-rose-500/20 text-xs font-semibold transition-all cursor-pointer"><i class="fa-solid fa-trash-can mr-1"></i> លុប</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // 🔍 ស្វែងរកបុគ្គលិកក្នុងបញ្ជី
         function filterEmployeesList() {
             const searchText = document.getElementById('searchEmployeeInput').value.toLowerCase().trim();
             const filtered = employeesList.filter(emp => {
@@ -431,7 +431,6 @@
             renderEmployeesTable(filtered);
         }
 
-        // 📊 Export Employees to Excel
         function exportEmployeesToExcel() {
             if (employeesList.length === 0) {
                 alert("មិនមានទិន្នន័យបុគ្គលិកទេ!");
@@ -449,11 +448,11 @@
             XLSX.writeFile(wb, `Employees_List_${todayStr}.xlsx`);
         }
 
-        // ✏️ Edit Employee Functions
-        function openEditEmployeeModal(id, fullName, username) {
+        function openEditEmployeeModal(id, fullName, username, role) {
             document.getElementById('editEmployeeId').value = id;
             document.getElementById('editFullName').value = fullName;
             document.getElementById('editUsername').value = username;
+            document.getElementById('editRole').value = role || 'employee';
             document.getElementById('editEmployeeModal').classList.remove('hidden');
         }
         function closeEditEmployeeModal() {
@@ -465,6 +464,7 @@
             const id = document.getElementById('editEmployeeId').value;
             const fullName = document.getElementById('editFullName').value.trim();
             const username = document.getElementById('editUsername').value.trim();
+            const role = document.getElementById('editRole').value;
 
             try {
                 const res = await fetch(`/api/admin/employee/${id}`, {
@@ -473,7 +473,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ fullName, username })
+                    body: JSON.stringify({ fullName, username, role })
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
@@ -481,22 +481,22 @@
                     closeEditEmployeeModal();
                     fetchEmployeesList();
                 } else {
-                    // បើគ្មាន Backend update ទេ Update ក្នុង Local ផ្ទាល់តែម្ដងដើម្បីឱ្យឃើញលទ្ធផល
                     const index = employeesList.findIndex(emp => (emp._id === id || emp.id === id));
                     if(index !== -1) {
                         employeesList[index].fullName = fullName;
                         employeesList[index].username = username;
+                        employeesList[index].role = role;
                     }
                     alert("កែប្រែបានជោគជ័យ (Local Update)!");
                     closeEditEmployeeModal();
                     renderEmployeesTable(employeesList);
                 }
             } catch (err) {
-                // Fallback Local Update
                 const index = employeesList.findIndex(emp => (emp._id === id || emp.id === id));
                 if(index !== -1) {
                     employeesList[index].fullName = fullName;
                     employeesList[index].username = username;
+                    employeesList[index].role = role;
                 }
                 alert("កែប្រែបានជោគជ័យ!");
                 closeEditEmployeeModal();
@@ -504,7 +504,6 @@
             }
         }
 
-        // 🗑️ លុបគណនីបុគ្គលិក
         async function deleteEmployee(id) {
             if (!confirm("តើអ្នកពិតជាចង់លុបបុគ្គលិកនេះមែនទេ?")) return;
             try {
@@ -663,6 +662,7 @@
             const fullName = document.getElementById('newFullName').value.trim();
             const username = document.getElementById('newUsername').value.trim();
             const password = document.getElementById('newPassword').value.trim();
+            const role = document.getElementById('newRole').value;
 
             try {
                 const res = await fetch('/api/admin/create-employee', {
@@ -671,7 +671,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ fullName, username, password })
+                    body: JSON.stringify({ fullName, username, password, role })
                 });
 
                 const data = await res.json();
@@ -683,14 +683,13 @@
                     document.getElementById('newPassword').value = '';
                     fetchEmployeesList();
                 } else {
-                    // Fallback Local Add
-                    employeesList.push({ _id: Date.now().toString(), fullName, username, role: 'employee' });
+                    employeesList.push({ _id: Date.now().toString(), fullName, username, role });
                     alert("បង្កើតបានជោគជ័យ!");
                     closeEmployeeModal();
                     renderEmployeesTable(employeesList);
                 }
             } catch (err) {
-                employeesList.push({ _id: Date.now().toString(), fullName, username, role: 'employee' });
+                employeesList.push({ _id: Date.now().toString(), fullName, username, role });
                 alert("បង្កើតបានជោគជ័យ!");
                 closeEmployeeModal();
                 renderEmployeesTable(employeesList);
@@ -715,7 +714,6 @@
             }
         }
 
-        // ចាប់ផ្តើមទាញយកទិន្នន័យពេល Refresh ទំព័រ
         fetchAttendanceLogs();
         fetchEmployeesList();
     </script>
