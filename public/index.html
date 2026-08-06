@@ -112,6 +112,11 @@
     </div>
 
     <script>
+        // 📍 កំណត់ទីតាំងកូអរដោនេ GPS ក្រុមហ៊ុន (Latitude & Longitude)
+        const OFFICE_LAT = 11.5564; // កែសម្រួល Latitude ក្រុមហ៊ុនបង
+        const OFFICE_LNG = 104.9282; // កែសម្រួល Longitude ក្រុមហ៊ុនបង
+        const MAX_ALLOWED_DISTANCE = 30; // កំណត់ចម្ងាយអតិបរមា ៣០ ម៉ែត្រ
+
         const token = localStorage.getItem('token');
         const userStr = localStorage.getItem('user');
         if (!token || !userStr) window.location.href = '/login.html';
@@ -150,6 +155,21 @@
             }
         }
 
+        // 📐 រូបមន្តគណនាចម្ងាយរវាង GPS បុគ្គលិក និង GPS ក្រុមហ៊ុន (គិតជាម៉ែត្រ)
+        function getDistanceMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371e3;
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
         async function toggleCamera() {
             const placeholder = document.getElementById('cameraPlaceholder');
             const btnText = document.getElementById('camBtnText');
@@ -185,8 +205,51 @@
         }
 
         async function onScanSuccess(decodedText) {
-            // ពេលស្កេនបាន QR Code ជោគជ័យ
-            await scanAttendance(decodedText);
+            const resultBox = document.getElementById('resultBox');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultMessage = document.getElementById('resultMessage');
+
+            resultBox.classList.remove('hidden');
+            resultBox.className = "mt-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-center";
+            resultIcon.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-amber-400"></i>`;
+            resultMessage.innerHTML = `<span class="text-amber-400">កំពុងពិនិត្យទីតាំង GPS របស់បង...</span>`;
+
+            // 🌐 ពិនិត្យទីតាំង GPS បុគ្គលិកមុននឹងអនុញ្ញាតឱ្យស្កេន
+            if (!navigator.geolocation) {
+                showResultError("ឧបករណ៍របស់បងមិនគាំទ្រប្រព័ន្ធ GPS ទេ!");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    const distance = getDistanceMeters(OFFICE_LAT, OFFICE_LNG, userLat, userLng);
+
+                    if (distance > MAX_ALLOWED_DISTANCE) {
+                        showResultError(`បរាជ័យ! បងស្ថិតនៅឆ្ងាយពីក្រុមហ៊ុនប្រហែល ${Math.round(distance)} ម៉ែត្រ (អនុញ្ញាតត្រឹម ${MAX_ALLOWED_DISTANCE}m)`);
+                        return;
+                    }
+
+                    // បើនៅក្នុងរង្វង់ ៣០ ម៉ែត្រ ទើបផ្ញើទៅស្កេនលើ Server
+                    await scanAttendance(decodedText);
+                },
+                (err) => {
+                    showResultError("សូមបើក Location (GPS) លើទូរស័ព្ទ រួច Allow ដើម្បីស្កេនវត្តមាន!");
+                },
+                { enableHighAccuracy: true }
+            );
+        }
+
+        function showResultError(msg) {
+            const resultBox = document.getElementById('resultBox');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultMessage = document.getElementById('resultMessage');
+
+            resultBox.classList.remove('hidden');
+            resultIcon.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400"></i>`;
+            resultMessage.innerHTML = `<span class="text-red-400">${msg}</span>`;
+            resultBox.className = "mt-4 bg-red-500/10 border border-red-500/30 rounded-2xl p-4 text-center";
         }
 
         async function scanAttendance(qrCodeValue) {
@@ -212,15 +275,10 @@
                     resultMessage.innerHTML = `<span class="text-emerald-400">${data.message}</span>`;
                     resultBox.className = "mt-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 text-center";
                 } else {
-                    resultIcon.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400"></i>`;
-                    resultMessage.innerHTML = `<span class="text-red-400">${data.message || 'ស្កេនបរាជ័យ!'}</span>`;
-                    resultBox.className = "mt-4 bg-red-500/10 border border-red-500/30 rounded-2xl p-4 text-center";
+                    showResultError(data.message || 'ស្កេនបរាជ័យ!');
                 }
             } catch (err) {
-                resultBox.classList.remove('hidden');
-                resultIcon.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i>`;
-                resultMessage.innerHTML = `<span class="text-amber-400">មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ!</span>`;
-                resultBox.className = "mt-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-center";
+                showResultError('មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ!');
             }
         }
     </script>
