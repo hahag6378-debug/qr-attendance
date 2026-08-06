@@ -49,7 +49,11 @@
                 <label class="block text-xs font-semibold text-zinc-300 mb-2">ពាក្យសម្ងាត់ (Password)</label>
                 <div class="relative">
                     <i class="fa-solid fa-key absolute left-4 top-3.5 text-zinc-500 text-sm"></i>
-                    <input type="password" id="password" required placeholder="បញ្ចូលពាក្យសម្ងាត់..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-orange-500 transition-all">
+                    <input type="password" id="password" required placeholder="បញ្ចូលពាក្យសម្ងាត់..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-11 pr-11 py-3 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-orange-500 transition-all">
+                    <!-- ប៊ូតុងបិទបើកមើលពាក្យសម្ងាត់ (Show/Hide Password) -->
+                    <button type="button" onclick="togglePasswordVisibility()" class="absolute right-4 top-3.5 text-zinc-500 hover:text-orange-400 transition-colors text-sm focus:outline-none cursor-pointer">
+                        <i id="toggleIcon" class="fa-solid fa-eye"></i>
+                    </button>
                 </div>
             </div>
 
@@ -67,12 +71,27 @@
     </div>
 
     <script>
+        // 👁️ Function បិទបើកមើលពាក្យសម្ងាត់
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
         async function handleLogin(e) {
             e.preventDefault();
             const usernameInput = document.getElementById('username').value.trim();
             const passwordInput = document.getElementById('password').value.trim();
             const errorBox = document.getElementById('errorBox');
-            const errorMessage = document.getElementById('errorMessage');
             const submitBtn = document.getElementById('submitBtn');
             const btnText = document.getElementById('btnText');
 
