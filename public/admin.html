@@ -94,7 +94,7 @@
 
         </div>
 
-        <!-- Navigation Tabs (ប្តូររវាង របាយការណ៍វត្តមាន និង បញ្ជីបុគ្គលិក) -->
+        <!-- Navigation Tabs -->
         <div class="flex space-x-3 mb-6 border-b border-zinc-800 pb-3">
             <button onclick="switchTab('attendance')" id="tabAttendanceBtn" class="bg-orange-500 text-zinc-950 px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-lg shadow-orange-500/20 cursor-pointer">
                 <i class="fa-solid fa-clipboard-user mr-1.5"></i> របាយការណ៍វត្តមាន
@@ -104,7 +104,7 @@
             </button>
         </div>
 
-        <!-- SECTION 1: របាយការណ៍វត្តមាន (Attendance Section) -->
+        <!-- SECTION 1: របាយการណ៍វត្តមាន (Attendance Section) -->
         <div id="attendanceSection">
             <!-- Filter Controls -->
             <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 p-5 shadow-xl mb-6 backdrop-blur-xl">
@@ -171,12 +171,24 @@
         <!-- SECTION 2: បញ្ជីបុគ្គលិក (Employees Section) -->
         <div id="employeesSection" class="hidden">
             <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 shadow-2xl overflow-hidden">
-                <div class="p-5 border-b border-zinc-800 flex justify-between items-center">
+                <div class="p-5 border-b border-zinc-800 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <h3 class="text-sm font-bold text-white uppercase tracking-wider"><i class="fa-solid fa-users text-orange-400 mr-2"></i> បញ្ជីឈ្មោះបុគ្គលិកសរុបក្នុងប្រព័ន្ធ</h3>
-                    <button onclick="openEmployeeModal()" class="text-xs bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-zinc-950 font-bold px-3 py-1.5 rounded-lg border border-orange-500/20 transition-all cursor-pointer">
-                        <i class="fa-solid fa-plus mr-1"></i> បន្ថែមថ្មី
-                    </button>
+                    
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <!-- Search Employee -->
+                        <div class="relative flex-1 sm:w-64">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-zinc-500 text-xs"></i>
+                            <input type="text" id="searchEmployeeInput" onkeyup="filterEmployeesList()" placeholder="ស្វែងរកបុគ្គលិក..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
+                        </div>
+                        <button onclick="exportEmployeesToExcel()" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-600/30 text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-excel"></i> Export
+                        </button>
+                        <button onclick="openEmployeeModal()" class="text-xs bg-orange-500 text-zinc-950 hover:bg-orange-600 font-bold px-3 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus"></i> បន្ថែមថ្មី
+                        </button>
+                    </div>
                 </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -230,7 +242,32 @@
         </div>
     </div>
 
-    <!-- Modal 2: QR Code ក្រុមហ៊ុន -->
+    <!-- Modal 2: កែប្រែបុគ្គលិក (Edit Employee Modal) -->
+    <div id="editEmployeeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl relative">
+            <button onclick="closeEditEmployeeModal()" class="absolute right-5 top-5 text-zinc-500 hover:text-white text-lg cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-user-pen text-orange-400 mr-2"></i>កែប្រែព័ត៌មានបុគ្គលិក</h2>
+            
+            <form onsubmit="handleUpdateEmployee(event)" class="space-y-4">
+                <input type="hidden" id="editEmployeeId">
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-300 mb-1.5">ឈ្មោះពេញ (Full Name)</label>
+                    <input type="text" id="editFullName" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-300 mb-1.5">ឈ្មោះគណនី (Username)</label>
+                    <input type="text" id="editUsername" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-orange-500">
+                </div>
+                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 font-bold py-3 rounded-xl shadow-lg shadow-orange-500/20 text-sm transition-all cursor-pointer">
+                    រក្សាទុកការកែប្រែ
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: QR Code ក្រុមហ៊ុន -->
     <div id="companyQrModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
         <div class="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl relative text-center">
             <button onclick="toggleCompanyQRModal()" class="absolute right-5 top-5 text-zinc-500 hover:text-white text-lg cursor-pointer">
@@ -362,12 +399,82 @@
                     <td class="py-4 px-6 font-semibold text-white">${emp.fullName || emp.username}</td>
                     <td class="py-4 px-6 text-zinc-300 font-mono">${emp.username}</td>
                     <td class="py-4 px-6">${roleBadge}</td>
-                    <td class="py-4 px-6 text-center">
-                        ${emp.role !== 'admin' ? `<button onclick="deleteEmployee('${emp._id || emp.id}')" class="bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white px-3 py-1.5 rounded-lg border border-rose-500/20 text-xs font-semibold transition-all cursor-pointer"><i class="fa-solid fa-trash-can mr-1"></i> លុប</button>` : '<span class="text-xs text-zinc-600">មិនអាចលុប</span>'}
+                    <td class="py-4 px-6 text-center space-x-2">
+                        ${emp.role !== 'admin' ? `
+                            <button onclick="openEditEmployeeModal('${emp._id || emp.id}', '${emp.fullName || ''}', '${emp.username}')" class="bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-zinc-950 px-3 py-1.5 rounded-lg border border-amber-500/20 text-xs font-semibold transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square mr-1"></i> កែប្រែ</button>
+                            <button onclick="deleteEmployee('${emp._id || emp.id}')" class="bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white px-3 py-1.5 rounded-lg border border-rose-500/20 text-xs font-semibold transition-all cursor-pointer"><i class="fa-solid fa-trash-can mr-1"></i> លុប</button>
+                        ` : '<span class="text-xs text-zinc-600">មិនមានសិទ្ធិកែប្រែ</span>'}
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        // 🔍 ស្វែងរកបុគ្គលិកក្នុងបញ្ជី
+        function filterEmployeesList() {
+            const searchText = document.getElementById('searchEmployeeInput').value.toLowerCase().trim();
+            const filtered = employeesList.filter(emp => 
+                (emp.fullName && emp.fullName.toLowerCase().includes(searchText)) || 
+                emp.username.toLowerCase().includes(searchText)
+            );
+            renderEmployeesTable(filtered);
+        }
+
+        // 📊 Export Employees to Excel
+        function exportEmployeesToExcel() {
+            if (employeesList.length === 0) {
+                alert("មិនមានទិន្នន័យបុគ្គលិកទេ!");
+                return;
+            }
+            const rows = employeesList.map((emp, index) => ({
+                "ល.រ": index + 1,
+                "ឈ្មោះពេញ": emp.fullName || '---',
+                "ឈ្មោះគណនី": emp.username,
+                "តួនាទី": emp.role
+            }));
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Employees List");
+            XLSX.writeFile(wb, `Employees_List_${todayStr}.xlsx`);
+        }
+
+        // ✏️ Edit Employee Functions
+        function openEditEmployeeModal(id, fullName, username) {
+            document.getElementById('editEmployeeId').value = id;
+            document.getElementById('editFullName').value = fullName;
+            document.getElementById('editUsername').value = username;
+            document.getElementById('editEmployeeModal').classList.remove('hidden');
+        }
+        function closeEditEmployeeModal() {
+            document.getElementById('editEmployeeModal').classList.add('hidden');
+        }
+
+        async function handleUpdateEmployee(e) {
+            e.preventDefault();
+            const id = document.getElementById('editEmployeeId').value;
+            const fullName = document.getElementById('editFullName').value.trim();
+            const username = document.getElementById('editUsername').value.trim();
+
+            try {
+                const res = await fetch(`/api/admin/employee/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ fullName, username })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("កែប្រែព័ត៌មានបុគ្គលិកបានជោគជ័យ!");
+                    closeEditEmployeeModal();
+                    fetchEmployeesList();
+                } else {
+                    alert(data.message || "កែប្រែមិនបានសម្រេច!");
+                }
+            } catch (err) {
+                alert("មានបញ្ហាក្នុងការតភ្ជាប់ទៅកាន់ Server!");
+            }
         }
 
         // 🗑️ លុបគណនីបុគ្គលិក
