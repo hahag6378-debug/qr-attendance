@@ -3,75 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Add Employee</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Admin Dashboard - QR Attendance</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Khmer Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif; }
-        body { background: #F1F5F9; padding: 20px; }
-        .container { background: white; max-width: 500px; margin: 0 auto; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        h2 { margin-top: 0; }
-        input { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #CBD5E1; border-radius: 8px; }
-        button { width: 100%; padding: 12px; background: #16A34A; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-        .btn-logout { background: #DC2626; margin-top: 10px; }
-        .msg { margin-top: 10px; font-weight: 600; }
+        * { font-family: 'Kantumruy Pro', sans-serif; }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.15; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.08); }
+        }
+        .animate-pulse-bg {
+            animation: pulse-slow 7s ease-in-out infinite;
+        }
     </style>
 </head>
-<body>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen relative overflow-x-hidden selection:bg-orange-500 selection:text-black">
 
-<div class="container">
-    <h2>👤 បន្ថែមបុគ្គលិកថ្មី (Add Employee)</h2>
-    <label>ឈ្មោះពេញ (Full Name):</label>
-    <input type="text" id="fullName" placeholder="ឧទាហរណ៍៖ សុខ ជា">
+    <!-- Background Ambient Glow Effects -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/20 rounded-full blur-[120px] pointer-events-none animate-pulse-bg"></div>
+    <div class="absolute top-1/2 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
 
-    <label>Username (សម្រាប់ Login):</label>
-    <input type="text" id="username" placeholder="ឧទាហរណ៍៖ sokchea">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-800/80">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 group cursor-pointer">
+                <div class="bg-gradient-to-tr from-orange-600 to-amber-500 p-2.5 rounded-2xl text-zinc-950 font-bold shadow-lg shadow-orange-500/20 group-hover:scale-110 group-hover:shadow-orange-500/40 transition-all duration-300">
+                    <i class="fa-solid fa-qrcode text-lg"></i>
+                </div>
+                <span class="text-lg font-bold tracking-wider text-zinc-100 group-hover:text-orange-400 transition duration-300">
+                    QR ATTENDANCE
+                </span>
+            </div>
+            <button onclick="logout()" 
+                class="flex items-center space-x-2 bg-zinc-900 hover:bg-orange-500/10 text-zinc-400 hover:text-orange-400 px-4 py-2 rounded-xl border border-zinc-800 hover:border-orange-500/40 transition-all duration-300 text-sm font-semibold hover:shadow-lg hover:shadow-orange-500/10 active:scale-95 cursor-pointer">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>ចាកចេញ</span>
+            </button>
+        </div>
+    </nav>
 
-    <label>Password:</label>
-    <input type="password" id="password" placeholder="បញ្ចូលពាក្យសម្ងាត់">
+    <!-- Main Content Container -->
+    <div class="max-w-2xl mx-auto py-10 px-4 sm:px-6 relative z-10">
+        
+        <!-- Header Banner Card -->
+        <div class="relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-800/80 rounded-3xl p-6 sm:p-8 mb-8 shadow-2xl group hover:border-orange-500/30 transition-all duration-500">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-orange-500 to-amber-500"></div>
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+                        <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+                        Admin Panel
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-wide mt-1">គ្រប់គ្រងបុគ្គលិក</h1>
+                    <p class="text-zinc-400 text-sm mt-1">បង្កើត និងគ្រប់គ្រងគណនីបុគ្គលិកសម្រាប់ស្កេនវត្តមាន</p>
+                </div>
+                <div class="hidden sm:flex w-16 h-16 rounded-2xl bg-orange-500/10 border border-orange-500/20 items-center justify-center text-3xl text-orange-400 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-inner">
+                    <i class="fa-solid fa-users-gear"></i>
+                </div>
+            </div>
+        </div>
 
-    <button onclick="addEmployee()">+ បន្ថែមបុគ្គលិក</button>
-    <button class="btn-logout" onclick="logout()">ចាកចេញ (Logout)</button>
+        <!-- Add Employee Form Card -->
+        <div class="bg-zinc-900/90 rounded-3xl shadow-2xl border border-zinc-800/80 p-6 sm:p-8 backdrop-blur-xl hover:border-orange-500/40 hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] transition-all duration-500">
+            <div class="flex items-center space-x-3 mb-6 border-b border-zinc-800/80 pb-4">
+                <div class="w-11 h-11 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 shadow-inner">
+                    <i class="fa-solid fa-user-plus text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-white tracking-wide">បន្ថែមបុគ្គលិកថ្មី</h2>
+                    <p class="text-xs text-zinc-400">បញ្ចូលព័ត៌មានគណនីខាងក្រោម</p>
+                </div>
+            </div>
 
-    <div id="msg" class="msg"></div>
-</div>
+            <form id="addEmployeeForm" class="space-y-5">
+                <!-- Full Name -->
+                <div class="group">
+                    <label class="block text-sm font-semibold text-zinc-300 mb-2 group-focus-within:text-orange-400 transition-colors">ឈ្មោះពេញ (Full Name)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-orange-400 transition-colors">
+                            <i class="fa-solid fa-id-card"></i>
+                        </span>
+                        <input type="text" id="fullName" placeholder="ឧ. សុខ ជា" required 
+                            class="w-full pl-11 pr-4 py-3.5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-sm">
+                    </div>
+                </div>
 
-<script>
-    const token = localStorage.getItem('token');
-    if (!token) window.location.href = '/login.html';
+                <!-- Username -->
+                <div class="group">
+                    <label class="block text-sm font-semibold text-zinc-300 mb-2 group-focus-within:text-orange-400 transition-colors">ឈ្មោះគណនី (Username)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-orange-400 transition-colors">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="empUsername" placeholder="ឧ. sokchea" required 
+                            class="w-full pl-11 pr-4 py-3.5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-sm">
+                    </div>
+                </div>
 
-    async function addEmployee() {
-        const fullName = document.getElementById('fullName').value.trim();
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value.trim();
-        const msg = document.getElementById('msg');
+                <!-- Password -->
+                <div class="group">
+                    <label class="block text-sm font-semibold text-zinc-300 mb-2 group-focus-within:text-orange-400 transition-colors">ពាក្យសម្ងាត់ (Password)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-orange-400 transition-colors">
+                            <i class="fa-solid fa-key"></i>
+                        </span>
+                        <input type="password" id="empPassword" placeholder="••••••••" required 
+                            class="w-full pl-11 pr-4 py-3.5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-sm">
+                    </div>
+                </div>
 
-        const res = await fetch('/api/admin/add-employee', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({ fullName, username, password })
-        });
+                <!-- Submit Button -->
+                <button type="submit" 
+                    class="w-full mt-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-zinc-950 font-bold py-4 px-4 rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35 hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer">
+                    <i class="fa-solid fa-plus text-lg"></i>
+                    <span class="tracking-wide">រក្សាទុកបុគ្គលិក</span>
+                </button>
+            </form>
+        </div>
+    </div>
 
-        const data = await res.json();
-        if (res.ok && data.success) {
-            msg.style.color = 'green';
-            msg.innerText = '✅ ' + data.message;
-            document.getElementById('fullName').value = '';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-        } else {
-            msg.style.color = 'red';
-            msg.innerText = '❌ ' + data.message;
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
         }
-    }
 
-    function logout() {
-        localStorage.clear();
-        window.location.href = '/login.html';
-    }
-</script>
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
 
+        document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('fullName').value;
+            const username = document.getElementById('empUsername').value;
+            const password = document.getElementById('empPassword').value;
+
+            try {
+                const res = await fetch('/api/admin/add-employee', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ fullName, username, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    alert('✅ ' + data.message);
+                    document.getElementById('addEmployeeForm').reset();
+                } else {
+                    alert('❌ ' + (data.message || 'បន្ថែមបរាជ័យ!'));
+                }
+            } catch (err) {
+                alert('មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ!');
+            }
+        });
+    </script>
 </body>
 </html>
