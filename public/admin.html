@@ -29,7 +29,7 @@
     <div class="absolute top-1/2 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
 
     <!-- Navigation Bar -->
-    <nav class="sticky top-0 z-50 bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-800/80">
+    <nav class="sticky top-0 z-50 bg-zinc-900/85 backdrop-blur-xl border-b border-zinc-800/80">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="bg-gradient-to-tr from-orange-600 to-amber-500 p-2.5 rounded-2xl text-zinc-950 font-bold shadow-lg shadow-orange-500/20">
@@ -61,14 +61,14 @@
                     <span class="inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-3">
                         <i class="fa-solid fa-shield-halved"></i> Control Panel
                     </span>
-                    <h1 class="text-2xl font-bold text-white">របាយការណ៍វត្តមាន និងគ្រប់គ្រងបុគ្គលិក</h1>
-                    <p class="text-xs text-zinc-400 mt-1">ពិនិត្យមើលវត្តមាន Check-In / Check-Out ទាញយក Excel និងបង្កើត QR Code ក្រុមហ៊ុន</p>
+                    <h1 class="text-2xl font-bold text-white">ប្រព័ន្ធគ្រប់គ្រងវត្តមាន និងបុគ្គលិក</h1>
+                    <p class="text-xs text-zinc-400 mt-1">ពិនិត្យមើលវត្តមាន Check-In / Check-Out បញ្ជីបុគ្គលិក ទាញយក Excel និង QR Code</p>
                 </div>
 
                 <div class="flex flex-wrap gap-3 mt-6">
                     <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center space-x-2 transition-all shadow-lg shadow-emerald-600/20 cursor-pointer">
                         <i class="fa-solid fa-file-excel text-sm"></i>
-                        <span>ទាញយកជា Excel (.xlsx)</span>
+                        <span>ទាញយក Excel វត្តមាន</span>
                     </button>
                     <button onclick="toggleCompanyQRModal()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center space-x-2 transition-all cursor-pointer">
                         <i class="fa-solid fa-qrcode text-sm"></i>
@@ -94,66 +94,109 @@
 
         </div>
 
-        <!-- Filter Controls -->
-        <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 p-5 shadow-xl mb-6 backdrop-blur-xl">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-                
-                <div>
-                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ជ្រើសរើសប្រភេទ Filter</label>
-                    <select id="filterMode" onchange="toggleFilterInputs()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-orange-500">
-                        <option value="day">តាមថ្ងៃ (Daily)</option>
-                        <option value="month">តាមខែ (Monthly)</option>
-                    </select>
-                </div>
+        <!-- Navigation Tabs (ប្តូររវាង របាយការណ៍វត្តមាន និង បញ្ជីបុគ្គលិក) -->
+        <div class="flex space-x-3 mb-6 border-b border-zinc-800 pb-3">
+            <button onclick="switchTab('attendance')" id="tabAttendanceBtn" class="bg-orange-500 text-zinc-950 px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-lg shadow-orange-500/20 cursor-pointer">
+                <i class="fa-solid fa-clipboard-user mr-1.5"></i> របាយការណ៍វត្តមាន
+            </button>
+            <button onclick="switchTab('employees')" id="tabEmployeesBtn" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white px-5 py-2.5 rounded-xl font-bold text-xs border border-zinc-800 transition-all cursor-pointer">
+                <i class="fa-solid fa-users mr-1.5"></i> បញ្ជីបុគ្គលិកសរុប
+            </button>
+        </div>
 
-                <div id="dayFilterBox">
-                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ជ្រើសរើសថ្ងៃ</label>
-                    <input type="date" id="filterDate" onchange="applyFilters()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-orange-500">
-                </div>
+        <!-- SECTION 1: របាយការណ៍វត្តមាន (Attendance Section) -->
+        <div id="attendanceSection">
+            <!-- Filter Controls -->
+            <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 p-5 shadow-xl mb-6 backdrop-blur-xl">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ជ្រើសរើសប្រភេទ Filter</label>
+                        <select id="filterMode" onchange="toggleFilterInputs()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-orange-500">
+                            <option value="day">តាមថ្ងៃ (Daily)</option>
+                            <option value="month">តាមខែ (Monthly)</option>
+                        </select>
+                    </div>
 
-                <div id="monthFilterBox" class="hidden">
-                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ជ្រើសរើសខែ</label>
-                    <input type="month" id="filterMonth" onchange="applyFilters()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-orange-500">
-                </div>
+                    <div id="dayFilterBox">
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ជ្រើសរើសថ្ងៃ</label>
+                        <input type="date" id="filterDate" onchange="applyFilters()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-orange-500">
+                    </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ស្វែងរកតាមឈ្មោះ</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-zinc-500 text-xs"></i>
-                        <input type="text" id="searchName" onkeyup="applyFilters()" placeholder="វាយឈ្មោះបុគ្គលិក..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-3 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-orange-500">
+                    <div id="monthFilterBox" class="hidden">
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ជ្រើសរើសខែ</label>
+                        <input type="month" id="filterMonth" onchange="applyFilters()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-orange-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ស្វែងរកតាមឈ្មោះ</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-zinc-500 text-xs"></i>
+                            <input type="text" id="searchName" onkeyup="applyFilters()" placeholder="វាយឈ្មោះបុគ្គលិក..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-3 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-orange-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <button onclick="resetFilters()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold py-2.5 px-4 rounded-xl border border-zinc-700 transition-all text-sm cursor-pointer">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> កំណត់ឡើងវិញ
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                <div>
-                    <button onclick="resetFilters()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold py-2.5 px-4 rounded-xl border border-zinc-700 transition-all text-sm cursor-pointer">
-                        <i class="fa-solid fa-rotate-left mr-1"></i> កំណត់ឡើងវិញ
-                    </button>
+            <!-- Attendance Report Table -->
+            <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 shadow-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-zinc-950/80 border-b border-zinc-800 text-xs text-zinc-400 font-bold uppercase tracking-wider">
+                                <th class="py-4 px-6">ឈ្មោះបុគ្គលិក</th>
+                                <th class="py-4 px-6">កាលបរិច្ឆេទ</th>
+                                <th class="py-4 px-6">ម៉ោងចូល (Check-In)</th>
+                                <th class="py-4 px-6">ម៉ោងចេញ (Check-Out)</th>
+                                <th class="py-4 px-6">ស្ថានភាព</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody" class="divide-y divide-zinc-800/60 text-sm">
+                        </tbody>
+                    </table>
                 </div>
 
+                <div id="noDataMessage" class="hidden py-12 text-center">
+                    <i class="fa-solid fa-folder-open text-4xl text-zinc-600 mb-3"></i>
+                    <p class="text-zinc-400 text-sm">មិនមានទិន្នន័យវត្តមានសម្រាប់ Filter នេះទេ!</p>
+                </div>
             </div>
         </div>
 
-        <!-- Attendance Report Table -->
-        <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 shadow-2xl overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-zinc-950/80 border-b border-zinc-800 text-xs text-zinc-400 font-bold uppercase tracking-wider">
-                            <th class="py-4 px-6">ឈ្មោះបុគ្គលិក</th>
-                            <th class="py-4 px-6">កាលបរិច្ឆេទ</th>
-                            <th class="py-4 px-6">ម៉ោងចូល (Check-In)</th>
-                            <th class="py-4 px-6">ម៉ោងចេញ (Check-Out)</th>
-                            <th class="py-4 px-6">ស្ថានភាព</th>
-                        </tr>
-                    </thead>
-                    <tbody id="attendanceTableBody" class="divide-y divide-zinc-800/60 text-sm">
-                    </tbody>
-                </table>
-            </div>
+        <!-- SECTION 2: បញ្ជីបុគ្គលិក (Employees Section) -->
+        <div id="employeesSection" class="hidden">
+            <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 shadow-2xl overflow-hidden">
+                <div class="p-5 border-b border-zinc-800 flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider"><i class="fa-solid fa-users text-orange-400 mr-2"></i> รายชื่อបុគ្គលិកសរុបក្នុងប្រព័ន្ធ</h3>
+                    <button onclick="openEmployeeModal()" class="text-xs bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-zinc-950 font-bold px-3 py-1.5 rounded-lg border border-orange-500/20 transition-all cursor-pointer">
+                        <i class="fa-solid fa-plus mr-1"></i> បន្ថែមថ្មី
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-zinc-950/80 border-b border-zinc-800 text-xs text-zinc-400 font-bold uppercase tracking-wider">
+                                <th class="py-4 px-6">ល.រ</th>
+                                <th class="py-4 px-6">ឈ្មោះពេញ (Full Name)</th>
+                                <th class="py-4 px-6">ឈ្មោះគណនី (Username)</th>
+                                <th class="py-4 px-6">តួនាទី (Role)</th>
+                                <th class="py-4 px-6 text-center">សកម្មភាព</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesTableBody" class="divide-y divide-zinc-800/60 text-sm">
+                        </tbody>
+                    </table>
+                </div>
 
-            <div id="noDataMessage" class="hidden py-12 text-center">
-                <i class="fa-solid fa-folder-open text-4xl text-zinc-600 mb-3"></i>
-                <p class="text-zinc-400 text-sm">មិនមានទិន្នន័យវត្តមានសម្រាប់ Filter នេះទេ!</p>
+                <div id="noEmployeesMessage" class="hidden py-12 text-center">
+                    <i class="fa-solid fa-users-slash text-4xl text-zinc-600 mb-3"></i>
+                    <p class="text-zinc-400 text-sm">មិនមានទិន្នន័យបុគ្គលិកទេ!</p>
+                </div>
             </div>
         </div>
 
@@ -162,7 +205,7 @@
     <!-- Modal 1: បន្ថែមបុគ្គលិកថ្មី -->
     <div id="employeeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
         <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl relative">
-            <button onclick="closeEmployeeModal()" class="absolute right-5 top-5 text-zinc-500 hover:text-white text-lg">
+            <button onclick="closeEmployeeModal()" class="absolute right-5 top-5 text-zinc-500 hover:text-white text-lg cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-user-plus text-orange-400 mr-2"></i>បង្កើតគណនីបុគ្គលិក</h2>
@@ -190,7 +233,7 @@
     <!-- Modal 2: QR Code ក្រុមហ៊ុន -->
     <div id="companyQrModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
         <div class="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl relative text-center">
-            <button onclick="toggleCompanyQRModal()" class="absolute right-5 top-5 text-zinc-500 hover:text-white text-lg">
+            <button onclick="toggleCompanyQRModal()" class="absolute right-5 top-5 text-zinc-500 hover:text-white text-lg cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h2 class="text-lg font-bold text-white mb-1">QR Code ស្កេនវត្តមាន</h2>
@@ -226,10 +269,32 @@
         }
 
         let rawLogs = [];
+        let employeesList = [];
         let currentFilteredData = [];
         const OFFICIAL_START_TIME = "08:00:00"; 
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('filterDate').value = todayStr;
+
+        // 🔀 Switch Tab Logic
+        function switchTab(tab) {
+            const attBtn = document.getElementById('tabAttendanceBtn');
+            const empBtn = document.getElementById('tabEmployeesBtn');
+            const attSec = document.getElementById('attendanceSection');
+            const empSec = document.getElementById('employeesSection');
+
+            if (tab === 'attendance') {
+                attBtn.className = "bg-orange-500 text-zinc-950 px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-lg shadow-orange-500/20 cursor-pointer";
+                empBtn.className = "bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white px-5 py-2.5 rounded-xl font-bold text-xs border border-zinc-800 transition-all cursor-pointer";
+                attSec.classList.remove('hidden');
+                empSec.classList.add('hidden');
+            } else {
+                empBtn.className = "bg-orange-500 text-zinc-950 px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-lg shadow-orange-500/20 cursor-pointer";
+                attBtn.className = "bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white px-5 py-2.5 rounded-xl font-bold text-xs border border-zinc-800 transition-all cursor-pointer";
+                empSec.classList.remove('hidden');
+                attSec.classList.add('hidden');
+                fetchEmployeesList();
+            }
+        }
 
         function toggleFilterInputs() {
             const mode = document.getElementById('filterMode').value;
@@ -254,13 +319,79 @@
                     applyFilters();
                 }
             } catch (err) {
-                console.error("មិនអាចទាញយកទិន្នន័យបានទេ:", err);
+                console.error("មិនអាចទាញយកទិន្នន័យវត្តមានបានទេ:", err);
+            }
+        }
+
+        // 👥 ទាញយកបញ្ជីបុគ្គលិកពី Server
+        async function fetchEmployeesList() {
+            try {
+                const res = await fetch('/api/admin/employees', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    employeesList = data.employees;
+                    renderEmployeesTable(employeesList);
+                }
+            } catch (err) {
+                console.error("មិនអាចទាញយកបញ្ជីបុគ្គលិកបានទេ:", err);
+            }
+        }
+
+        function renderEmployeesTable(employees) {
+            const tbody = document.getElementById('employeesTableBody');
+            const noMsg = document.getElementById('noEmployeesMessage');
+            tbody.innerHTML = '';
+
+            if (employees.length === 0) {
+                noMsg.classList.remove('hidden');
+                return;
+            }
+            noMsg.classList.add('hidden');
+
+            employees.forEach((emp, index) => {
+                const roleBadge = emp.role === 'admin' 
+                    ? `<span class="bg-orange-500/10 text-orange-400 border border-orange-500/30 text-xs px-2.5 py-1 rounded-full font-semibold">Admin</span>`
+                    : `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 text-xs px-2.5 py-1 rounded-full font-semibold">Employee</span>`;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-zinc-800/40 transition-all border-b border-zinc-800/40";
+                tr.innerHTML = `
+                    <td class="py-4 px-6 text-zinc-400">${index + 1}</td>
+                    <td class="py-4 px-6 font-semibold text-white">${emp.fullName || emp.username}</td>
+                    <td class="py-4 px-6 text-zinc-300 font-mono">${emp.username}</td>
+                    <td class="py-4 px-6">${roleBadge}</td>
+                    <td class="py-4 px-6 text-center">
+                        ${emp.role !== 'admin' ? `<button onclick="deleteEmployee('${emp._id || emp.id}')" class="bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white px-3 py-1.5 rounded-lg border border-rose-500/20 text-xs font-semibold transition-all cursor-pointer"><i class="fa-solid fa-trash-can mr-1"></i> លុប</button>` : '<span class="text-xs text-zinc-600">មិនអាចលុប</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 🗑️ លុបគណនីបុគ្គលិក
+        async function deleteEmployee(id) {
+            if (!confirm("តើអ្នកពិតជាចង់លុបបុគ្គលិកនេះមែនទេ?")) return;
+            try {
+                const res = await fetch(`/api/admin/employee/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("លុបបុគ្គលិកបានជោគជ័យ!");
+                    fetchEmployeesList();
+                } else {
+                    alert(data.message || "លុបមិនបានសម្រេច!");
+                }
+            } catch (err) {
+                alert("មានបញ្ហាក្នុងការតភ្ជាប់ទៅកាន់ Server!");
             }
         }
 
         function processLogs(logs) {
             const grouped = {};
-
             logs.forEach(log => {
                 const dateObj = new Date(log.createdAt);
                 const dateStr = dateObj.toLocaleDateString('sv-SE');
@@ -282,7 +413,6 @@
                     grouped[key].checkOut = timeStr;
                 }
             });
-
             return Object.values(grouped);
         }
 
@@ -367,7 +497,6 @@
             toggleFilterInputs();
         }
 
-        // 📊 Function ទាញយក File Excel (.xlsx)
         function exportToExcel() {
             if (currentFilteredData.length === 0) {
                 alert("មិនមានទិន្នន័យសម្រាប់ទាញយកទេ!");
@@ -388,14 +517,13 @@
             XLSX.writeFile(workbook, `Attendance_Report_${todayStr}.xlsx`);
         }
 
-        // 👤 Modals Controls
         function openEmployeeModal() { document.getElementById('employeeModal').classList.remove('hidden'); }
         function closeEmployeeModal() { document.getElementById('employeeModal').classList.add('hidden'); }
 
         async function handleCreateEmployee(e) {
             e.preventDefault();
             const fullName = document.getElementById('newFullName').value.trim();
-            const username = document.getElementById('newUsername').value.trim();
+            const username = document.getElementById('newUsername.').value?.trim() || document.getElementById('newUsername').value.trim();
             const password = document.getElementById('newPassword').value.trim();
 
             try {
@@ -415,6 +543,7 @@
                     document.getElementById('newFullName').value = '';
                     document.getElementById('newUsername').value = '';
                     document.getElementById('newPassword').value = '';
+                    fetchEmployeesList();
                 } else {
                     alert(data.message || "បង្កើតមិនបានសម្រេច!");
                 }
