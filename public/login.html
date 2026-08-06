@@ -40,7 +40,7 @@
         </div>
 
         <!-- Login Form -->
-        <form id="loginForm" class="space-y-5">
+        <form id="loginForm" novalidate class="space-y-5">
             <!-- Username -->
             <div class="group/input">
                 <label class="block text-sm font-semibold text-zinc-300 mb-2 group-focus-within/input:text-orange-400 transition-colors">ឈ្មោះគណនី (Username)</label>
@@ -48,7 +48,7 @@
                     <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within/input:text-orange-400 transition-colors">
                         <i class="fa-solid fa-user"></i>
                     </span>
-                    <input type="text" id="username" placeholder="បញ្ចូល Username" required 
+                    <input type="text" id="username" placeholder="បញ្ចូល Username" 
                         class="w-full pl-11 pr-4 py-3.5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-sm">
                 </div>
             </div>
@@ -60,7 +60,7 @@
                     <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within/input:text-orange-400 transition-colors">
                         <i class="fa-solid fa-key"></i>
                     </span>
-                    <input type="password" id="password" placeholder="••••••••" required 
+                    <input type="password" id="password" placeholder="••••••••" 
                         class="w-full pl-11 pr-4 py-3.5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-sm">
                 </div>
             </div>
@@ -68,11 +68,11 @@
             <!-- Error Message Alert -->
             <div id="message" class="hidden text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center font-medium"></div>
 
-            <!-- Submit Button -->
-            <button type="submit" 
-                class="w-full mt-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-zinc-950 font-bold py-4 px-4 rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35 hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer">
-                <i class="fa-solid fa-right-to-bracket text-lg"></i>
-                <span class="tracking-wide">LOGIN ចូលប្រព័ន្ធ</span>
+            <!-- Submit Button with Arrow Effect -->
+            <button type="submit" id="submitBtn"
+                class="group/btn w-full mt-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-zinc-950 font-bold py-4 px-4 rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35 hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed">
+                <i id="btnIcon" class="fa-solid fa-right-to-bracket text-lg transition-transform duration-300 group-hover/btn:translate-x-1.5"></i>
+                <span id="btnText" class="tracking-wide">LOGIN ចូលប្រព័ន្ធ</span>
             </button>
         </form>
     </div>
@@ -80,11 +80,25 @@
     <script>
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
             const messageDiv = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnText = document.getElementById('btnText');
 
             messageDiv.classList.add('hidden');
+
+            if (!username || !password) {
+                messageDiv.innerText = 'សូមបញ្ចូល Username និង Password ឱ្យបានគ្រប់គ្រាន់!';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+
+            // 🟢 បង្កើត Effect ពេលចុច៖ ព្រួញរត់ទៅស្តាំ & ដូរអក្សរ
+            submitBtn.disabled = true;
+            btnIcon.className = 'fa-solid fa-arrow-right text-lg translate-x-3 animate-pulse transition-all duration-300';
+            btnText.innerText = 'កំពុងចូលប្រព័ន្ធ...';
 
             try {
                 const res = await fetch('/api/auth/login', {
@@ -107,10 +121,18 @@
                 } else {
                     messageDiv.innerText = data.message || 'Login បរាជ័យ!';
                     messageDiv.classList.remove('hidden');
+                    resetButton();
                 }
             } catch (err) {
                 messageDiv.innerText = 'មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ!';
                 messageDiv.classList.remove('hidden');
+                resetButton();
+            }
+
+            function resetButton() {
+                submitBtn.disabled = false;
+                btnIcon.className = 'fa-solid fa-right-to-bracket text-lg transition-transform duration-300 group-hover/btn:translate-x-1.5';
+                btnText.innerText = 'LOGIN ចូលប្រព័ន្ធ';
             }
         });
     </script>
