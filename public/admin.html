@@ -3,168 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - QR Attendance</title>
-    <!-- Tailwind CSS CDN -->
+    <title>គ្រប់គ្រងប្រព័ន្ធ - Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Khmer Font -->
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SheetJS for Export to Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { font-family: 'Kantumruy Pro', sans-serif; }
-        @keyframes pulse-slow {
-            0%, 100% { opacity: 0.15; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(1.08); }
-        }
-        .animate-pulse-bg {
-            animation: pulse-slow 7s ease-in-out infinite;
-        }
     </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen relative overflow-x-hidden selection:bg-orange-500 selection:text-black">
+<body class="bg-zinc-950 text-zinc-100 min-h-screen relative selection:bg-orange-500 selection:text-black">
 
-    <!-- Background Ambient Glow Effects -->
-    <div class="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/20 rounded-full blur-[120px] pointer-events-none animate-pulse-bg"></div>
-    <div class="absolute top-1/2 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
-
-    <!-- Navigation Bar -->
+    <!-- Navigation -->
     <nav class="sticky top-0 z-50 bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-800/80">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3 group cursor-pointer">
-                <div class="bg-gradient-to-tr from-orange-600 to-amber-500 p-2.5 rounded-2xl text-zinc-950 font-bold shadow-lg shadow-orange-500/20 group-hover:scale-110 group-hover:shadow-orange-500/40 transition-all duration-300">
-                    <i class="fa-solid fa-qrcode text-lg"></i>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-orange-600 to-amber-500 p-2.5 rounded-2xl text-zinc-950 font-bold">
+                    <i class="fa-solid fa-user-shield text-lg"></i>
                 </div>
-                <span class="text-lg font-bold tracking-wider text-zinc-100 group-hover:text-orange-400 transition duration-300">
-                    QR ATTENDANCE
-                </span>
+                <span class="text-lg font-bold tracking-wider text-zinc-100">ADMIN DASHBOARD</span>
             </div>
-            <button onclick="logout()" 
-                class="flex items-center space-x-2 bg-zinc-900 hover:bg-orange-500/10 text-zinc-400 hover:text-orange-400 px-4 py-2 rounded-xl border border-zinc-800 hover:border-orange-500/40 transition-all duration-300 text-sm font-semibold hover:shadow-lg hover:shadow-orange-500/10 active:scale-95 cursor-pointer">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>ចាកចេញ</span>
+            <button onclick="logout()" class="bg-zinc-900 hover:bg-orange-500/10 text-zinc-400 hover:text-orange-400 px-4 py-2 rounded-xl border border-zinc-800 hover:border-orange-500/40 transition-all text-sm font-semibold cursor-pointer">
+                <i class="fa-solid fa-right-from-bracket"></i> ចាកចេញ
             </button>
         </div>
     </nav>
 
-    <!-- Main Content Container -->
-    <div class="max-w-2xl mx-auto py-10 px-4 sm:px-6 relative z-10">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 space-y-8">
         
-        <!-- Header Banner Card -->
-        <div class="relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-800/80 rounded-3xl p-6 sm:p-8 mb-8 shadow-2xl group hover:border-orange-500/30 transition-all duration-500">
-            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-orange-500 to-amber-500"></div>
-            <div class="flex items-center justify-between">
+        <!-- Top Stats / Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Add Employee Form -->
+            <div class="md:col-span-1 bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 shadow-2xl">
+                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-orange-400"></i> បន្ថែមបុគ្គលិកថ្មី
+                </h2>
+                <form id="addEmployeeForm" class="space-y-4">
+                    <div>
+                        <label class="text-xs font-semibold text-zinc-400">ឈ្មោះពេញ (Full Name)</label>
+                        <input type="text" id="empFullName" placeholder="ឧ. សុខ មករា" class="w-full mt-1 p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:border-orange-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-zinc-400">ឈ្មោះគណនី (Username)</label>
+                        <input type="text" id="empUsername" placeholder="ឧ. sokmakara" class="w-full mt-1 p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:border-orange-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-zinc-400">ពាក្យសម្ងាត់ (Password)</label>
+                        <input type="password" id="empPassword" placeholder="••••••••" class="w-full mt-1 p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:border-orange-500 outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-zinc-950 font-bold py-3 rounded-xl hover:scale-[1.01] transition-all cursor-pointer">
+                        បង្កើតគណនីបុគ្គលិក
+                    </button>
+                </form>
+                <div id="addEmpMsg" class="hidden mt-3 text-xs text-center p-2 rounded-xl"></div>
+            </div>
+
+            <!-- QR Code Generator Card -->
+            <div class="md:col-span-2 bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 shadow-2xl flex flex-col justify-between">
                 <div>
-                    <span class="inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
-                        <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
-                        Admin Panel
-                    </span>
-                    <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-wide mt-1">គ្រប់គ្រងបុគ្គលិក</h1>
-                    <p class="text-zinc-400 text-sm mt-1">បង្កើត និងគ្រប់គ្រងគណនីបុគ្គលិកសម្រាប់ស្កេនវត្តមាន</p>
+                    <h2 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-qrcode text-orange-400"></i> QR Code សម្រាប់បិទនៅក្រុមហ៊ុន
+                    </h2>
+                    <p class="text-xs text-zinc-400 mb-4">បុគ្គលិកអាចប្រើកាមេរ៉ាទូរស័ព្ទស្កេន QR Code នេះដើម្បី Check-In / Check-Out</p>
                 </div>
-                <div class="hidden sm:flex w-16 h-16 rounded-2xl bg-orange-500/10 border border-orange-500/20 items-center justify-center text-3xl text-orange-400 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-inner">
-                    <i class="fa-solid fa-users-gear"></i>
+                <div class="flex flex-col sm:flex-row items-center gap-6 bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
+                    <img id="companyQr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=COMPANY_ATTENDANCE_SECRET_KEY" alt="Company QR" class="w-32 h-32 rounded-xl border border-orange-500/30">
+                    <div class="space-y-2 text-center sm:text-left">
+                        <span class="text-xs bg-orange-500/10 text-orange-400 border border-orange-500/20 px-3 py-1 rounded-full font-semibold">Official Company QR</span>
+                        <p class="text-xs text-zinc-400">បងអាច Print QR Code នេះយកទៅបិទនៅច្រកចូលក្រុមហ៊ុនបាន!</p>
+                        <a href="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=COMPANY_ATTENDANCE_SECRET_KEY" download="Company_QR.png" target="_blank" class="inline-block bg-zinc-800 hover:bg-zinc-700 text-xs font-bold py-2 px-4 rounded-xl border border-zinc-700">
+                            <i class="fa-solid fa-download mr-1"></i> ទាញយក QR Code
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Add Employee Form Card -->
-        <div class="bg-zinc-900/90 rounded-3xl shadow-2xl border border-zinc-800/80 p-6 sm:p-8 backdrop-blur-xl hover:border-orange-500/40 hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] transition-all duration-500">
-            <div class="flex items-center space-x-3 mb-6 border-b border-zinc-800/80 pb-4">
-                <div class="w-11 h-11 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 shadow-inner">
-                    <i class="fa-solid fa-user-plus text-lg"></i>
-                </div>
+        <!-- Attendance Report Table & Export Button -->
+        <div class="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 shadow-2xl">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 border-b border-zinc-800 pb-4">
                 <div>
-                    <h2 class="text-lg font-bold text-white tracking-wide">បន្ថែមបុគ្គលិកថ្មី</h2>
-                    <p class="text-xs text-zinc-400">បញ្ចូលព័ត៌មានគណនីខាងក្រោម</p>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-file-invoice text-orange-400"></i> របាយការណ៍វត្តមានបុគ្គលិក
+                    </h2>
+                    <p class="text-xs text-zinc-400 mt-1">ទិន្នន័យស្កេនវត្តមានជាក់ស្តែង និងការគណនាម៉ោងយឺត</p>
                 </div>
+                <!-- Export to Excel Button -->
+                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center space-x-2 cursor-pointer">
+                    <i class="fa-solid fa-file-excel text-lg"></i>
+                    <span>Export ជា Excel</span>
+                </button>
             </div>
 
-            <form id="addEmployeeForm" class="space-y-5">
-                <!-- Full Name -->
-                <div class="group">
-                    <label class="block text-sm font-semibold text-zinc-300 mb-2 group-focus-within:text-orange-400 transition-colors">ឈ្មោះពេញ (Full Name)</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-orange-400 transition-colors">
-                            <i class="fa-solid fa-id-card"></i>
-                        </span>
-                        <input type="text" id="fullName" placeholder="ឧ. សុខ ជា" required 
-                            class="w-full pl-11 pr-4 py-3.5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-sm">
-                    </div>
-                </div>
-
-                <!-- Username -->
-                <div class="group">
-                    <label class="block text-sm font-semibold text-zinc-300 mb-2 group-focus-within:text-orange-400 transition-colors">ឈ្មោះគណនី (Username)</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-orange-400 transition-colors">
-                            <i class="fa-solid fa-user"></i>
-                        </span>
-                        <input type="text" id="empUsername" placeholder="ឧ. sokchea" required 
-                            class="w-full pl-11 pr-4 py-3.5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-sm">
-                    </div>
-                </div>
-
-                <!-- Password -->
-                <div class="group">
-                    <label class="block text-sm font-semibold text-zinc-300 mb-2 group-focus-within:text-orange-400 transition-colors">ពាក្យសម្ងាត់ (Password)</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-orange-400 transition-colors">
-                            <i class="fa-solid fa-key"></i>
-                        </span>
-                        <input type="password" id="empPassword" placeholder="••••••••" required 
-                            class="w-full pl-11 pr-4 py-3.5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-sm">
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" 
-                    class="w-full mt-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-zinc-950 font-bold py-4 px-4 rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35 hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer">
-                    <i class="fa-solid fa-plus text-lg"></i>
-                    <span class="tracking-wide">រក្សាទុកបុគ្គលិក</span>
-                </button>
-            </form>
+            <!-- Table Container -->
+            <div class="overflow-x-auto">
+                <table id="attendanceTable" class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-zinc-800 text-xs font-semibold text-zinc-400 uppercase tracking-wider bg-zinc-950/50">
+                            <th class="p-4 rounded-l-xl">កាលបរិច្ឆេទ</th>
+                            <th class="p-4">ឈ្មោះបុគ្គលិក</th>
+                            <th class="p-4">ប្រភេទ</th>
+                            <th class="p-4">ម៉ោងស្កេន</th>
+                            <th class="p-4 rounded-r-xl">ស្ថានភាព</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody" class="divide-y divide-zinc-800/50 text-sm">
+                        <!-- Dynamic Rows loaded via JS -->
+                        <tr>
+                            <td colspan="5" class="p-4 text-center text-zinc-500 text-xs">កំពុងទាញយកទិន្នន័យ...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
         const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = '/login.html';
-        }
+        const userStr = localStorage.getItem('user');
+        if (!token || !userStr) window.location.href = '/login.html';
 
         function logout() {
             localStorage.clear();
             window.location.href = '/login.html';
         }
 
+        // Add Employee
         document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const fullName = document.getElementById('fullName').value;
-            const username = document.getElementById('empUsername').value;
-            const password = document.getElementById('empPassword').value;
+            const fullName = document.getElementById('empFullName').value.trim();
+            const username = document.getElementById('empUsername').value.trim();
+            const password = document.getElementById('empPassword').value.trim();
+            const msg = document.getElementById('addEmpMsg');
 
             try {
-                const res = await fetch('/api/admin/add-employee', {
+                const res = await fetch('/api/admin/create-employee', {
                     method: 'POST',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ fullName, username, password })
                 });
+                const data = await res.json();
+                msg.classList.remove('hidden');
+                if (res.ok && data.success) {
+                    msg.className = "mt-3 text-xs text-center p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                    msg.innerText = "បង្កើតគណនីបុគ្គលិកជោគជ័យ!";
+                    document.getElementById('addEmployeeForm').reset();
+                } else {
+                    msg.className = "mt-3 text-xs text-center p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20";
+                    msg.innerText = data.message || "បង្កើតមិនបានសម្រេច!";
+                }
+            } catch (err) {
+                msg.classList.remove('hidden');
+                msg.className = "mt-3 text-xs text-center p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20";
+                msg.innerText = "មានបញ្ហាភ្ជាប់ទៅ Server!";
+            }
+        });
 
+        // Fetch Attendance Report
+        let attendanceData = [];
+        async function fetchAttendanceLogs() {
+            const tbody = document.getElementById('reportTableBody');
+            try {
+                const res = await fetch('/api/admin/attendance-logs', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 const data = await res.json();
 
                 if (res.ok && data.success) {
-                    alert('✅ ' + data.message);
-                    document.getElementById('addEmployeeForm').reset();
-                } else {
-                    alert('❌ ' + (data.message || 'បន្ថែមបរាជ័យ!'));
+                    attendanceData = data.logs || [];
+                    if (attendanceData.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-zinc-500 text-xs">មិនទាន់មានទិន្នន័យស្កេនវត្តមាននៅឡើយទេ</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = attendanceData.map(log => {
+                        const dateObj = new Date(log.createdAt);
+                        const dateStr = dateObj.toLocaleDateString('km-KH');
+                        const timeStr = dateObj.toLocaleTimeString('en-US', { hour12: true });
+
+                        // Late Calculation: Check-In after 8:00 AM
+                        let statusBadge = '';
+                        if (log.actionType === 'Check-In') {
+                            const hours = dateObj.getHours();
+                            const minutes = dateObj.getMinutes();
+                            if (hours > 8 || (hours === 8 && minutes > 0)) {
+                                statusBadge = `<span class="bg-red-500/10 text-red-400 border border-red-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">មកយឺត (Late)</span>`;
+                            } else {
+                                statusBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">ទាន់ម៉ោង (On Time)</span>`;
+                            }
+                        } else {
+                            statusBadge = `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">ចេញពីការងារ</span>`;
+                        }
+
+                        return `
+                            <tr class="hover:bg-zinc-900/50 transition duration-200">
+                                <td class="p-4 text-zinc-300 font-medium">${dateStr}</td>
+                                <td class="p-4 text-white font-semibold">${log.employeeName || log.username}</td>
+                                <td class="p-4 font-bold ${log.actionType === 'Check-In' ? 'text-orange-400' : 'text-zinc-400'}">${log.actionType}</td>
+                                <td class="p-4 text-zinc-300">${timeStr}</td>
+                                <td class="p-4">${statusBadge}</td>
+                            </tr>
+                        `;
+                    }).join('');
                 }
             } catch (err) {
-                alert('មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ!');
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-red-400 text-xs">មិនអាចទាញយកទិន្នន័យបានទេ!</td></tr>`;
             }
-        });
+        }
+
+        // Export to Excel Function
+        function exportToExcel() {
+            if (attendanceData.length === 0) {
+                alert("គ្មានទិន្នន័យសម្រាប់ Export ទេ!");
+                return;
+            }
+
+            const excelRows = attendanceData.map(log => {
+                const dateObj = new Date(log.createdAt);
+                const hours = dateObj.getHours();
+                const minutes = dateObj.getMinutes();
+                
+                let status = 'ចេញពីការងារ';
+                if (log.actionType === 'Check-In') {
+                    status = (hours > 8 || (hours === 8 && minutes > 0)) ? 'មកយឺត (Late)' : 'ទាន់ម៉ោង (On Time)';
+                }
+
+                return {
+                    "កាលបរិច្ឆេទ": dateObj.toLocaleDateString('km-KH'),
+                    "ឈ្មោះបុគ្គលិក": log.employeeName || log.username,
+                    "ប្រភេទស្កេន": log.actionType,
+                    "ម៉ោងស្កេន": dateObj.toLocaleTimeString('en-US', { hour12: true }),
+                    "ស្ថានភាព": status
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(excelRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance Report");
+            XLSX.writeFile(workbook, "Attendance_Report.xlsx");
+        }
+
+        fetchAttendanceLogs();
     </script>
 </body>
 </html>
