@@ -10,20 +10,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Khmer Font -->
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- HTML5 QR Code Library -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         * { font-family: 'Kantumruy Pro', sans-serif; }
         @keyframes pulse-slow {
             0%, 100% { opacity: 0.15; transform: scale(1); }
             50% { opacity: 0.3; transform: scale(1.08); }
         }
-        .animate-pulse-bg {
-            animation: pulse-slow 7s ease-in-out infinite;
-        }
+        .animate-pulse-bg { animation: pulse-slow 7s ease-in-out infinite; }
+        #reader video { border-radius: 1rem; object-fit: cover; }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen relative overflow-x-hidden selection:bg-orange-500 selection:text-black">
 
-    <!-- Background Ambient Glow Effects -->
     <div class="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/20 rounded-full blur-[120px] pointer-events-none animate-pulse-bg"></div>
     <div class="absolute top-1/2 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
 
@@ -31,75 +31,82 @@
     <nav class="sticky top-0 z-50 bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-800/80">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3 group cursor-pointer">
-                <div class="bg-gradient-to-tr from-orange-600 to-amber-500 p-2.5 rounded-2xl text-zinc-950 font-bold shadow-lg shadow-orange-500/20 group-hover:scale-110 group-hover:shadow-orange-500/40 transition-all duration-300">
+                <div class="bg-gradient-to-tr from-orange-600 to-amber-500 p-2.5 rounded-2xl text-zinc-950 font-bold shadow-lg shadow-orange-500/20">
                     <i class="fa-solid fa-qrcode text-lg"></i>
                 </div>
-                <span class="text-lg font-bold tracking-wider text-zinc-100 group-hover:text-orange-400 transition duration-300">
-                    QR ATTENDANCE
-                </span>
+                <span class="text-lg font-bold tracking-wider text-zinc-100">QR ATTENDANCE</span>
             </div>
-            <button onclick="logout()" 
-                class="flex items-center space-x-2 bg-zinc-900 hover:bg-orange-500/10 text-zinc-400 hover:text-orange-400 px-4 py-2 rounded-xl border border-zinc-800 hover:border-orange-500/40 transition-all duration-300 text-sm font-semibold hover:shadow-lg hover:shadow-orange-500/10 active:scale-95 cursor-pointer">
+            <button onclick="logout()" class="flex items-center space-x-2 bg-zinc-900 hover:bg-orange-500/10 text-zinc-400 hover:text-orange-400 px-4 py-2 rounded-xl border border-zinc-800 hover:border-orange-500/40 transition-all text-sm font-semibold cursor-pointer">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span>ចាកចេញ</span>
             </button>
         </div>
     </nav>
 
-    <!-- Main Content Container -->
-    <div class="max-w-2xl mx-auto py-10 px-4 sm:px-6 relative z-10">
+    <div class="max-w-2xl mx-auto py-8 px-4 sm:px-6 relative z-10">
         
-        <!-- Employee Info Card Header -->
-        <div class="relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-800/80 rounded-3xl p-6 sm:p-8 mb-8 shadow-2xl group hover:border-orange-500/30 transition-all duration-500">
+        <!-- Header Info -->
+        <div class="relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-800/80 rounded-3xl p-6 mb-6 shadow-2xl">
             <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-orange-500 to-amber-500"></div>
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <span class="inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
-                        <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
-                        Employee Portal
+                        <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span> Camera Attendance Scanner
                     </span>
-                    <h1 id="userGreeting" class="text-2xl sm:text-3xl font-bold text-white tracking-wide mt-1">សួស្តី!</h1>
-                    <p class="text-zinc-400 text-sm mt-1">សូមចុចប៊ូតុងខាងក្រោមដើម្បីកត់ត្រាវត្តមាន</p>
+                    <h1 id="userGreeting" class="text-2xl font-bold text-white mt-1">សួស្តី!</h1>
                 </div>
-                <!-- Clock Display -->
-                <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-2xl p-4 text-center sm:text-right shadow-inner">
-                    <div id="liveTime" class="text-2xl font-extrabold text-orange-400 tracking-wider">00:00:00</div>
-                    <div id="liveDate" class="text-xs text-zinc-500 font-medium mt-1">--/--/----</div>
+                <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-2xl p-3 text-center sm:text-right shadow-inner">
+                    <div id="liveTime" class="text-xl font-extrabold text-orange-400">00:00:00</div>
+                    <div id="liveDate" class="text-xs text-zinc-500 font-medium">--/--/----</div>
                 </div>
             </div>
         </div>
 
-        <!-- Scan Attendance Card -->
-        <div class="bg-zinc-900/90 rounded-3xl shadow-2xl border border-zinc-800/80 p-6 sm:p-8 backdrop-blur-xl hover:border-orange-500/40 hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] transition-all duration-500">
-            <div class="flex items-center space-x-3 mb-6 border-b border-zinc-800/80 pb-4">
-                <div class="w-11 h-11 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 shadow-inner">
-                    <i class="fa-solid fa-clock-rotate-left text-lg"></i>
-                </div>
-                <div>
-                    <h2 class="text-lg font-bold text-white tracking-wide">កត់ត្រាវត្តមាន</h2>
-                    <p class="text-xs text-zinc-400">ជ្រើសរើសប្រភេទស្កេនចូល ឬចេញ</p>
+        <!-- Camera Scanner Section -->
+        <div class="bg-zinc-900/90 rounded-3xl shadow-2xl border border-zinc-800/80 p-6 backdrop-blur-xl mb-6">
+            <div class="flex items-center justify-between mb-4 border-b border-zinc-800/80 pb-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
+                        <i class="fa-solid fa-camera text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-white">កាមេរ៉ាស្កេន QR Code</h2>
+                        <p class="text-xs text-zinc-400">បើកកាមេរ៉ារួចតម្រង់ទៅ QR Code ក្រុមហ៊ុន</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button onclick="scanAttendance('Check-In')" 
-                    class="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-zinc-950 font-bold py-5 px-6 rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-3 cursor-pointer">
-                    <i class="fa-solid fa-right-to-bracket text-xl"></i>
-                    <span class="text-base tracking-wide">CHECK-IN (ចូល)</span>
+            <!-- Action Selector: Check-In vs Check-Out -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <button id="btnCheckInMode" onclick="setScanMode('Check-In')" class="py-3 px-4 rounded-xl font-bold text-sm border transition-all flex items-center justify-center space-x-2 bg-orange-500 text-zinc-950 border-orange-500 shadow-lg shadow-orange-500/20 cursor-pointer">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Check-In (ចូល)</span>
                 </button>
-
-                <button onclick="scanAttendance('Check-Out')" 
-                    class="bg-zinc-950 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-zinc-800 hover:border-orange-500/40 font-bold py-5 px-6 rounded-2xl shadow-lg hover:shadow-orange-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-3 cursor-pointer">
-                    <i class="fa-solid fa-right-from-bracket text-xl text-orange-400"></i>
-                    <span class="text-base tracking-wide">CHECK-OUT (ចេញ)</span>
+                <button id="btnCheckOutMode" onclick="setScanMode('Check-Out')" class="py-3 px-4 rounded-xl font-bold text-sm border transition-all flex items-center justify-center space-x-2 bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-orange-500/40 cursor-pointer">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Check-Out (ចេញ)</span>
                 </button>
             </div>
+
+            <!-- Camera View Box -->
+            <div id="readerContainer" class="relative rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 min-h-[260px] flex items-center justify-center mb-4">
+                <div id="reader" class="w-full"></div>
+                <div id="cameraPlaceholder" class="text-center p-6">
+                    <i class="fa-solid fa-camera-rotate text-4xl text-zinc-600 mb-2"></i>
+                    <p class="text-xs text-zinc-500">ចុចប៊ូតុងខាងក្រោមដើម្បីបើកកាមេរ៉ា</p>
+                </div>
+            </div>
+
+            <!-- Toggle Camera Button -->
+            <button id="toggleCamBtn" onclick="toggleCamera()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all flex items-center justify-center space-x-2 cursor-pointer">
+                <i class="fa-solid fa-video"></i>
+                <span id="camBtnText">បើកកាមេរ៉ាស្កេន</span>
+            </button>
 
             <!-- Result Box -->
-            <div id="resultBox" class="hidden mt-6 bg-zinc-950/90 border border-zinc-800 rounded-2xl p-5 text-center transition-all duration-300">
-                <div id="resultIcon" class="text-3xl mb-2"></div>
-                <div id="resultMessage" class="text-sm font-semibold text-zinc-200"></div>
+            <div id="resultBox" class="hidden mt-4 bg-zinc-950/90 border border-zinc-800 rounded-2xl p-4 text-center">
+                <div id="resultIcon" class="text-2xl mb-1"></div>
+                <div id="resultMessage" class="text-sm font-semibold"></div>
             </div>
         </div>
     </div>
@@ -107,30 +114,82 @@
     <script>
         const token = localStorage.getItem('token');
         const userStr = localStorage.getItem('user');
-
-        if (!token || !userStr) {
-            window.location.href = '/login.html';
-        }
+        if (!token || !userStr) window.location.href = '/login.html';
 
         const user = JSON.parse(userStr);
         document.getElementById('userGreeting').innerText = `សួស្តី! ${user.fullName || user.username}`;
+
+        let currentScanMode = 'Check-In';
+        let html5QrcodeScanner = null;
+        let isCameraActive = false;
 
         function logout() {
             localStorage.clear();
             window.location.href = '/login.html';
         }
 
-        // Real-time Clock
         function updateClock() {
             const now = new Date();
             document.getElementById('liveTime').innerText = now.toLocaleTimeString('en-US', { hour12: false });
-            document.getElementById('liveDate').innerText = now.toLocaleDateString('km-KH', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            document.getElementById('liveDate').innerText = now.toLocaleDateString('km-KH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // API Scan Attendance
-        async function scanAttendance(actionType) {
+        function setScanMode(mode) {
+            currentScanMode = mode;
+            const btnIn = document.getElementById('btnCheckInMode');
+            const btnOut = document.getElementById('btnCheckOutMode');
+
+            if (mode === 'Check-In') {
+                btnIn.className = 'py-3 px-4 rounded-xl font-bold text-sm border transition-all flex items-center justify-center space-x-2 bg-orange-500 text-zinc-950 border-orange-500 shadow-lg shadow-orange-500/20 cursor-pointer';
+                btnOut.className = 'py-3 px-4 rounded-xl font-bold text-sm border transition-all flex items-center justify-center space-x-2 bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-orange-500/40 cursor-pointer';
+            } else {
+                btnOut.className = 'py-3 px-4 rounded-xl font-bold text-sm border transition-all flex items-center justify-center space-x-2 bg-orange-500 text-zinc-950 border-orange-500 shadow-lg shadow-orange-500/20 cursor-pointer';
+                btnIn.className = 'py-3 px-4 rounded-xl font-bold text-sm border transition-all flex items-center justify-center space-x-2 bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-orange-500/40 cursor-pointer';
+            }
+        }
+
+        async function toggleCamera() {
+            const placeholder = document.getElementById('cameraPlaceholder');
+            const btnText = document.getElementById('camBtnText');
+
+            if (!isCameraActive) {
+                placeholder.classList.add('hidden');
+                html5QrcodeScanner = new Html5Qrcode("reader");
+                
+                try {
+                    await html5QrcodeScanner.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: { width: 220, height: 220 } },
+                        onScanSuccess
+                    );
+                    isCameraActive = true;
+                    btnText.innerText = 'បិទកាមេរ៉ា';
+                } catch (err) {
+                    alert("មិនអាចបើកកាមេរ៉ាបានទេ! សូមពិនិត្យ Permission កាមេរ៉ាលើ Browser របស់បង។");
+                    placeholder.classList.remove('hidden');
+                }
+            } else {
+                stopCamera();
+            }
+        }
+
+        async function stopCamera() {
+            if (html5QrcodeScanner && isCameraActive) {
+                await html5QrcodeScanner.stop();
+                isCameraActive = false;
+                document.getElementById('cameraPlaceholder').classList.remove('hidden');
+                document.getElementById('camBtnText').innerText = 'បើកកាមេរ៉ាស្កេន';
+            }
+        }
+
+        async function onScanSuccess(decodedText) {
+            // ពេលស្កេនបាន QR Code ជោគជ័យ
+            await scanAttendance(decodedText);
+        }
+
+        async function scanAttendance(qrCodeValue) {
             const resultBox = document.getElementById('resultBox');
             const resultIcon = document.getElementById('resultIcon');
             const resultMessage = document.getElementById('resultMessage');
@@ -142,27 +201,26 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ actionType })
+                    body: JSON.stringify({ actionType: currentScanMode, qrCode: qrCodeValue })
                 });
 
                 const data = await res.json();
-
                 resultBox.classList.remove('hidden');
 
                 if (res.ok && data.success) {
                     resultIcon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i>`;
                     resultMessage.innerHTML = `<span class="text-emerald-400">${data.message}</span>`;
-                    resultBox.className = "mt-6 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-5 text-center shadow-lg shadow-emerald-500/5";
+                    resultBox.className = "mt-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 text-center";
                 } else {
                     resultIcon.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400"></i>`;
                     resultMessage.innerHTML = `<span class="text-red-400">${data.message || 'ស្កេនបរាជ័យ!'}</span>`;
-                    resultBox.className = "mt-6 bg-red-500/10 border border-red-500/30 rounded-2xl p-5 text-center shadow-lg shadow-red-500/5";
+                    resultBox.className = "mt-4 bg-red-500/10 border border-red-500/30 rounded-2xl p-4 text-center";
                 }
             } catch (err) {
                 resultBox.classList.remove('hidden');
                 resultIcon.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i>`;
                 resultMessage.innerHTML = `<span class="text-amber-400">មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ!</span>`;
-                resultBox.className = "mt-6 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5 text-center shadow-lg shadow-amber-500/5";
+                resultBox.className = "mt-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-center";
             }
         }
     </script>
