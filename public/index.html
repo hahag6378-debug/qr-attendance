@@ -3,182 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Attendance System</title>
+    <title>ស្កេនវត្តមាន - QR Attendance</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Khmer Font -->
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif !important; }
-        body { margin: 0; padding: 16px; background-color: #F1F5F9; color: #0F172A; text-align: center; }
-        .card { background: white; border-radius: 16px; padding: 24px 20px; max-width: 480px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        
-        .brand-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
+        * { font-family: 'Kantumruy Pro', sans-serif; }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.15; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.08); }
         }
-        .logo-svg {
-            width: 48px;
-            height: 48px;
-            flex-shrink: 0;
+        .animate-pulse-bg {
+            animation: pulse-slow 7s ease-in-out infinite;
         }
-        .brand-text {
-            text-align: left;
-        }
-        .brand-text h1 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 700;
-            color: #0F172A;
-            line-height: 1.2;
-        }
-        .brand-text p {
-            margin: 3px 0 0 0;
-            font-size: 12px;
-            color: #64748B;
-        }
-
-        .btn-group { display: flex; gap: 10px; margin-bottom: 16px; }
-        .btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
-        .btn-checkin { background: #E0E7FF; color: #3730A3; border: 2px solid #6366F1; }
-        .btn-checkin.active { background: #4F46E5; color: white; }
-        .btn-checkout { background: #FEE2E2; color: #991B1B; border: 2px solid #EF4444; }
-        .btn-checkout.active { background: #DC2626; color: white; }
-        
-        #interactive { width: 100%; max-width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background: #000; position: relative; }
-        #reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; }
-        
-        .status-msg { margin-top: 15px; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; display: none; }
-        .status-success { background: #DCFCE7; color: #166534; display: block; }
-        .status-error { background: #FEE2E2; color: #991B1B; display: block; }
-        
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #CBD5E1; margin-bottom: 14px; font-size: 14px; outline: none; transition: border-color 0.2s; }
-        input:focus { border-color: #4F46E5; }
-        /* 🔴 Style ពេលភ្លេចបញ្ចូលឈ្មោះ */
-        input.input-error { border: 2px solid #EF4444; background-color: #FEF2F2; }
     </style>
 </head>
-<body>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen relative overflow-x-hidden selection:bg-orange-500 selection:text-black">
 
-<div class="card">
-    <!-- Header / Logo -->
-    <div class="brand-header">
-        <svg class="logo-svg" viewBox="0 0 512 512" fill="none">
-            <path fill="#F16522" d="M403.75,289.1c-12.38-12.39-19.18-28.47-19.15-45.27c0.05-31.64,24.14-58.48,55.25-63.39c-10.47-30.2-27.76-57.4-51.84-81.59C345.37,56.02,293.31,34.6,231.84,34.6c-61.29,0-113.26,21.42-155.9,64.24c-42.64,42.83-63.95,95.08-63.95,156.73c0,61.85,21.32,114.29,63.95,157.29c42.64,43.02,94.61,64.52,155.9,64.52c61.47,0,113.53-21.5,156.17-64.52c29.93-30.18,49.35-65.01,58.28-104.48C430.61,307.56,415.26,300.63,403.75,289.1z M262.48,276.24c-8.06,8.54-18.28,12.8-30.64,12.8c-12.19,0-22.31-4.26-30.37-12.8c-8.06-8.52-12.09-19.26-12.09-32.18c0-12.94,4.03-23.66,12.09-32.19c8.06-8.53,18.18-12.79,30.37-12.79c12.37,0,22.58,4.26,30.64,12.79c8.06,8.53,12.08,19.26,12.08,32.19C274.56,256.98,270.54,267.72,262.48,276.24z"/>
-            <path fill="#F16522" d="M500.01,244.2c-0.18,25.42-19.36,46.64-43.9,49.93c-1.98,0.27-3.99,0.41-6.04,0.44c-0.37,0-0.76,0-1.13-0.01c-27.1-0.31-50.48-23.67-50.44-50.71c0.04-25.23,20.24-46.92,45.51-49.96c1.57-0.19,3.16-0.3,4.76-0.34c1.07-0.03,2.14-0.02,3.19,0.03C478.5,194.61,500.19,217.1,500.01,244.2z"/>
-        </svg>
-        <div class="brand-text">
-            <h1>ATTENDANCE SCANNER</h1>
-            <p>ប្រព័ន្ធស្កេនវត្តមានបុគ្គលិក</p>
+    <!-- Background Ambient Glow Effects -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/20 rounded-full blur-[120px] pointer-events-none animate-pulse-bg"></div>
+    <div class="absolute top-1/2 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-800/80">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 group cursor-pointer">
+                <div class="bg-gradient-to-tr from-orange-600 to-amber-500 p-2.5 rounded-2xl text-zinc-950 font-bold shadow-lg shadow-orange-500/20 group-hover:scale-110 group-hover:shadow-orange-500/40 transition-all duration-300">
+                    <i class="fa-solid fa-qrcode text-lg"></i>
+                </div>
+                <span class="text-lg font-bold tracking-wider text-zinc-100 group-hover:text-orange-400 transition duration-300">
+                    QR ATTENDANCE
+                </span>
+            </div>
+            <button onclick="logout()" 
+                class="flex items-center space-x-2 bg-zinc-900 hover:bg-orange-500/10 text-zinc-400 hover:text-orange-400 px-4 py-2 rounded-xl border border-zinc-800 hover:border-orange-500/40 transition-all duration-300 text-sm font-semibold hover:shadow-lg hover:shadow-orange-500/10 active:scale-95 cursor-pointer">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>ចាកចេញ</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="max-w-2xl mx-auto py-10 px-4 sm:px-6 relative z-10">
+        
+        <!-- Employee Info Card Header -->
+        <div class="relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-800/80 rounded-3xl p-6 sm:p-8 mb-8 shadow-2xl group hover:border-orange-500/30 transition-all duration-500">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-orange-500 to-amber-500"></div>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+                        <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+                        Employee Portal
+                    </span>
+                    <h1 id="userGreeting" class="text-2xl sm:text-3xl font-bold text-white tracking-wide mt-1">សួស្តី!</h1>
+                    <p class="text-zinc-400 text-sm mt-1">សូមចុចប៊ូតុងខាងក្រោមដើម្បីកត់ត្រាវត្តមាន</p>
+                </div>
+                <!-- Clock Display -->
+                <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-2xl p-4 text-center sm:text-right shadow-inner">
+                    <div id="liveTime" class="text-2xl font-extrabold text-orange-400 tracking-wider">00:00:00</div>
+                    <div id="liveDate" class="text-xs text-zinc-500 font-medium mt-1">--/--/----</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scan Attendance Card -->
+        <div class="bg-zinc-900/90 rounded-3xl shadow-2xl border border-zinc-800/80 p-6 sm:p-8 backdrop-blur-xl hover:border-orange-500/40 hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] transition-all duration-500">
+            <div class="flex items-center space-x-3 mb-6 border-b border-zinc-800/80 pb-4">
+                <div class="w-11 h-11 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 shadow-inner">
+                    <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-white tracking-wide">កត់ត្រាវត្តមាន</h2>
+                    <p class="text-xs text-zinc-400">ជ្រើសរើសប្រភេទស្កេនចូល ឬចេញ</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button onclick="scanAttendance('Check-In')" 
+                    class="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-zinc-950 font-bold py-5 px-6 rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-3 cursor-pointer">
+                    <i class="fa-solid fa-right-to-bracket text-xl"></i>
+                    <span class="text-base tracking-wide">CHECK-IN (ចូល)</span>
+                </button>
+
+                <button onclick="scanAttendance('Check-Out')" 
+                    class="bg-zinc-950 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-zinc-800 hover:border-orange-500/40 font-bold py-5 px-6 rounded-2xl shadow-lg hover:shadow-orange-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-3 cursor-pointer">
+                    <i class="fa-solid fa-right-from-bracket text-xl text-orange-400"></i>
+                    <span class="text-base tracking-wide">CHECK-OUT (ចេញ)</span>
+                </button>
+            </div>
+
+            <!-- Result Box -->
+            <div id="resultBox" class="hidden mt-6 bg-zinc-950/90 border border-zinc-800 rounded-2xl p-5 text-center transition-all duration-300">
+                <div id="resultIcon" class="text-3xl mb-2"></div>
+                <div id="resultMessage" class="text-sm font-semibold text-zinc-200"></div>
+            </div>
         </div>
     </div>
 
-    <div class="btn-group">
-        <button id="btnIn" class="btn btn-checkin active" onclick="setAction('Check-In')">👋 ចូល (Check-In)</button>
-        <button id="btnOut" class="btn btn-checkout" onclick="setAction('Check-Out')">🚪 ចេញ (Check-Out)</button>
-    </div>
+    <script>
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
 
-    <!-- ប្រអប់បញ្ចូលឈ្មោះទាមទារឱ្យបំពេញ -->
-    <input type="text" id="userName" placeholder="បញ្ចូលឈ្មោះ ឬ ID បុគ្គលិក (ទាមទារ) *" oninput="clearInputError()">
-
-    <div id="interactive">
-        <div id="reader" style="width: 100%; height: 100%;"></div>
-    </div>
-
-    <div id="statusBox" class="status-msg"></div>
-</div>
-
-<script>
-    let currentAction = 'Check-In';
-    let html5QrCode = null;
-    let isScanning = true;
-
-    function setAction(action) {
-        currentAction = action;
-        if (action === 'Check-In') {
-            document.getElementById('btnIn').classList.add('active');
-            document.getElementById('btnOut').classList.remove('active');
-        } else {
-            document.getElementById('btnOut').classList.add('active');
-            document.getElementById('btnIn').classList.remove('active');
-        }
-    }
-
-    function showStatus(message, isSuccess) {
-        const statusBox = document.getElementById('statusBox');
-        statusBox.innerText = message;
-        statusBox.className = 'status-msg ' + (isSuccess ? 'status-success' : 'status-error');
-    }
-
-    function clearInputError() {
-        const input = document.getElementById('userName');
-        if (input.value.trim() !== '') {
-            input.classList.remove('input-error');
-        }
-    }
-
-    async function onScanSuccess(decodedText, decodedResult) {
-        if (!isScanning) return;
-
-        const userInput = document.getElementById('userName');
-        const userName = userInput.value.trim();
-
-        // 🔴 ពិនិត្យមើលឈ្មោះ៖ បើអត់ទាន់បញ្ចូលឈ្មោះទេ នឹងបង្ហាញ Error ហើយមិនផ្ញើទៅ Server ឡើយ
-        if (!userName) {
-            userInput.classList.add('input-error');
-            userInput.focus();
-            showStatus('⚠️ សូមបញ្ចូលឈ្មោះ ឬ ID បុគ្គលិកជាមុនសិន មុននឹងស្កេន!', false);
-            return;
+        if (!token || !userStr) {
+            window.location.href = '/login.html';
         }
 
-        isScanning = false;
+        const user = JSON.parse(userStr);
+        document.getElementById('userGreeting').innerText = `សួស្តី! ${user.fullName || user.username}`;
 
-        try {
-            const response = await fetch('/api/scan-attendance', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userName: userName,
-                    actionType: currentAction,
-                    distance: 0
-                })
-            });
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
 
-            const result = await response.json();
+        // Real-time Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('liveTime').innerText = now.toLocaleTimeString('en-US', { hour12: false });
+            document.getElementById('liveDate').innerText = now.toLocaleDateString('km-KH', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-            if (response.ok && result.success) {
-                showStatus('✅ ' + result.message + ' (' + currentAction + ')', true);
-            } else {
-                showStatus('❌ ' + (result.message || 'មានបញ្ហាក្នុងការស្កេន!'), false);
+        // API Scan Attendance
+        async function scanAttendance(actionType) {
+            const resultBox = document.getElementById('resultBox');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultMessage = document.getElementById('resultMessage');
+
+            try {
+                const res = await fetch('/api/employee/scan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ actionType })
+                });
+
+                const data = await res.json();
+
+                resultBox.classList.remove('hidden');
+
+                if (res.ok && data.success) {
+                    resultIcon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i>`;
+                    resultMessage.innerHTML = `<span class="text-emerald-400">${data.message}</span>`;
+                    resultBox.className = "mt-6 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-5 text-center shadow-lg shadow-emerald-500/5";
+                } else {
+                    resultIcon.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400"></i>`;
+                    resultMessage.innerHTML = `<span class="text-red-400">${data.message || 'ស្កេនបរាជ័យ!'}</span>`;
+                    resultBox.className = "mt-6 bg-red-500/10 border border-red-500/30 rounded-2xl p-5 text-center shadow-lg shadow-red-500/5";
+                }
+            } catch (err) {
+                resultBox.classList.remove('hidden');
+                resultIcon.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i>`;
+                resultMessage.innerHTML = `<span class="text-amber-400">មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ!</span>`;
+                resultBox.className = "mt-6 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5 text-center shadow-lg shadow-amber-500/5";
             }
-        } catch (error) {
-            console.error(error);
-            showStatus('❌ មានបញ្ហាភ្ជាប់ទៅ Server!', false);
         }
-
-        // អនុញ្ញាតឱ្យស្កេនបន្តទៀតក្រោយ ២.៥ វិនាទី
-        setTimeout(() => {
-            isScanning = true;
-        }, 2500);
-    }
-
-    function startCamera() {
-        html5QrCode = new Html5Qrcode("reader");
-        const config = { fps: 10, qrbox: { width: 220, height: 220 } };
-
-        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-        .catch(err => {
-            console.warn("កាមេរ៉ាក្រោយមិនដើរ, កំពុងបើកកាមេរ៉ាដែលទំនេរ...", err);
-            html5QrCode.start({ facingMode: "user" }, config, onScanSuccess)
-            .catch(e => showStatus("❌ មិនអាចបើកកាមេរ៉ាបានទេ!", false));
-        });
-    }
-
-    window.onload = function() {
-        startCamera();
-    };
-</script>
-
+    </script>
 </body>
 </html>
